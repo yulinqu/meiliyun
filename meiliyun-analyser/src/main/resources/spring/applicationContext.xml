@@ -1,0 +1,247 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- 使用spring自带的占位符替换功能 -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<!-- 允许JVM参数覆盖 -->
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<!-- 忽略没有找到的资源文件 -->
+		<property name="ignoreResourceNotFound" value="true" />
+		<!-- 配置资源文件 -->
+		<property name="locations">
+			<list>
+				<value>classpath:meiliyun-analyser.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 扫描包 -->
+	<context:component-scan base-package="com.meiliyun.analyser"/>
+
+	 <!-- 定义数据源  ucdai-->
+	<!-- <bean id="dataSource_ucdai" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClassName" value="${ucdai.jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="url" value="${ucdai.jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${ucdai.jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${ucdai.jdbc.password}" />
+		
+		<property name="initialSize" value="${db.initialSize}" />
+		<property name="maxActive" value="${db.maxActive}" />
+		<property name="maxIdle" value="${db.maxIdle}" />
+		<property name="maxWait" value="${db.maxWait}" />
+		<property name="minIdle" value="${db.minIdle}" />
+		<property name="testWhileIdle" value="${db.testWhileIdle}" />
+		<property name="validationQuery" value="${db.validationQuery}" />
+		<property name="testOnBorrow" value="${db.testOnBorrow}" />
+		<property name="removeAbandoned" value="${db.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+		<property name="logAbandoned" value="${db.logAbandoned}" />
+		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
+	</bean> -->
+	
+	<!-- <bean id="sqlMapClient_rscore_ucdai" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_ucdai.xml" />
+		<property name="dataSource" ref="dataSource_ucdai" />
+	</bean> -->
+	
+	 <!-- 定义数据源  decision-->
+	<!-- <bean id="dataSource_decision" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClassName" value="${decision.jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="url" value="${decision.jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${decision.jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${decision.jdbc.password}" />
+		
+		<property name="initialSize" value="${db.initialSize}" />
+		<property name="maxActive" value="${db.maxActive}" />
+		<property name="maxIdle" value="${db.maxIdle}" />
+		<property name="maxWait" value="${db.maxWait}" />
+		<property name="minIdle" value="${db.minIdle}" />
+		<property name="testWhileIdle" value="${db.testWhileIdle}" />
+		<property name="validationQuery" value="${db.validationQuery}" />
+		<property name="testOnBorrow" value="${db.testOnBorrow}" />
+		<property name="removeAbandoned" value="${db.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+		<property name="logAbandoned" value="${db.logAbandoned}" />
+		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
+	</bean>
+	
+	<bean id="sqlMapClient_rscore_decision" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_decision.xml" />
+		<property name="dataSource" ref="dataSource_decision" />
+	</bean>
+	
+	 定义数据源  jujube
+	<bean id="dataSource_jujube" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClassName" value="${jujube.jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="url" value="${jujube.jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${jujube.jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${jujube.jdbc.password}" />
+		
+		<property name="initialSize" value="${db.initialSize}" />
+		<property name="maxActive" value="${db.maxActive}" />
+		<property name="maxIdle" value="${db.maxIdle}" />
+		<property name="maxWait" value="${db.maxWait}" />
+		<property name="minIdle" value="${db.minIdle}" />
+		<property name="testWhileIdle" value="${db.testWhileIdle}" />
+		<property name="validationQuery" value="${db.validationQuery}" />
+		<property name="testOnBorrow" value="${db.testOnBorrow}" />
+		<property name="removeAbandoned" value="${db.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+		<property name="logAbandoned" value="${db.logAbandoned}" />
+		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
+	</bean>
+	
+	<bean id="sqlMapClient_rscore_jujube" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_jujube.xml" />
+		<property name="dataSource" ref="dataSource_jujube" />
+	</bean>
+	
+	定义数据源  rsdata
+	<bean id="dataSource_rsdata" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClassName" value="${rsdata.jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="url" value="${rsdata.jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${rsdata.jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${rsdata.jdbc.password}" />
+		
+		<property name="initialSize" value="${db.initialSize}" />
+		<property name="maxActive" value="${db.maxActive}" />
+		<property name="maxIdle" value="${db.maxIdle}" />
+		<property name="maxWait" value="${db.maxWait}" />
+		<property name="minIdle" value="${db.minIdle}" />
+		<property name="testWhileIdle" value="${db.testWhileIdle}" />
+		<property name="validationQuery" value="${db.validationQuery}" />
+		<property name="testOnBorrow" value="${db.testOnBorrow}" />
+		<property name="removeAbandoned" value="${db.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+		<property name="logAbandoned" value="${db.logAbandoned}" />
+		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
+	</bean>
+	
+	<bean id="sqlMapClient_rscore_rsdata" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_rsdata.xml" />
+		<property name="dataSource" ref="dataSource_rsdata" />
+	</bean>
+	
+	定义数据源  rca
+	<bean id="dataSource_rca" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClassName" value="${rca.jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="url" value="${rca.jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${rca.jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${rca.jdbc.password}" />
+		
+		<property name="initialSize" value="${db.initialSize}" />
+		<property name="maxActive" value="${db.maxActive}" />
+		<property name="maxIdle" value="${db.maxIdle}" />
+		<property name="maxWait" value="${db.maxWait}" />
+		<property name="minIdle" value="${db.minIdle}" />
+		<property name="testWhileIdle" value="${db.testWhileIdle}" />
+		<property name="validationQuery" value="${db.validationQuery}" />
+		<property name="testOnBorrow" value="${db.testOnBorrow}" />
+		<property name="removeAbandoned" value="${db.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+		<property name="logAbandoned" value="${db.logAbandoned}" />
+		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
+	</bean>
+	
+	<bean id="sqlMapClient_rscore_rca" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_rca.xml" />
+		<property name="dataSource" ref="dataSource_rca" />
+	</bean>
+	
+	定义数据源  cw_mobp2p
+	<bean id="dataSource_cwmobp2p" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClassName" value="${cw_mobp2p.jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="url" value="${cw_mobp2p.jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${cw_mobp2p.jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${cw_mobp2p.jdbc.password}" />
+		
+		<property name="initialSize" value="${db.initialSize}" />
+		<property name="maxActive" value="${db.maxActive}" />
+		<property name="maxIdle" value="${db.maxIdle}" />
+		<property name="maxWait" value="${db.maxWait}" />
+		<property name="minIdle" value="${db.minIdle}" />
+		<property name="testWhileIdle" value="${db.testWhileIdle}" />
+		<property name="validationQuery" value="${db.validationQuery}" />
+		<property name="testOnBorrow" value="${db.testOnBorrow}" />
+		<property name="removeAbandoned" value="${db.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+		<property name="logAbandoned" value="${db.logAbandoned}" />
+		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
+	</bean>
+	
+	<bean id="sqlMapClient_rscore_cwmobp2p" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_cwmobp2p.xml" />
+		<property name="dataSource" ref="dataSource_cwmobp2p" />
+	</bean>
+	
+	
+	定义数据源  activity_mobp2p
+	<bean id="dataSource_activitymobp2p" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClassName" value="${activity_mobp2p.jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="url" value="${activity_mobp2p.jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${activity_mobp2p.jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${activity_mobp2p.jdbc.password}" />
+		
+		<property name="initialSize" value="${db.initialSize}" />
+		<property name="maxActive" value="${db.maxActive}" />
+		<property name="maxIdle" value="${db.maxIdle}" />
+		<property name="maxWait" value="${db.maxWait}" />
+		<property name="minIdle" value="${db.minIdle}" />
+		<property name="testWhileIdle" value="${db.testWhileIdle}" />
+		<property name="validationQuery" value="${db.validationQuery}" />
+		<property name="testOnBorrow" value="${db.testOnBorrow}" />
+		<property name="removeAbandoned" value="${db.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+		<property name="logAbandoned" value="${db.logAbandoned}" />
+		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
+	</bean>
+	
+	<bean id="sqlMapClient_rscore_activitymobp2p" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_activitymobp2p.xml" />
+		<property name="dataSource" ref="dataSource_activitymobp2p" />
+	</bean> -->
+	
+
+</beans>
