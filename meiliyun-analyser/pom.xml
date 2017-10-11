@@ -49,7 +49,18 @@
 		    <version>3.0.5.RELEASE</version>  
       	</dependency> 
 		
+		<dependency>
+			<groupId>ch.ethz.ganymed</groupId>
+			<artifactId>ganymed-ssh2</artifactId>
+			<version>build210</version>
+		</dependency>
 		
+		
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		    <version>3.4</version>
+		</dependency>
 		<!-- ibatis -->
 		<!-- <dependency>  
 		    <groupId>org.apache.ibatis</groupId>  
@@ -126,6 +137,12 @@
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-collections4</artifactId>
 		    <version>4.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		    <version>3.4</version>
 		</dependency>
 
 		<!-- 时间操作组件 -->
