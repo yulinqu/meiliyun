@@ -60,17 +60,27 @@ public class ScpTask {
                 // 埋点数据
                 String data = split[2];
                 if (StringUtils.isNotBlank(data) && data.contains("/img/behavior.gif?")) {
-                    // 访问列表
-                    if (data.contains("/img/behavior.gif??rnd=")) {
+                    // 访问list_page
+                    if (data.contains("/img/behavior.gif?rnd=")) {
 
                     }
-                    // 点击
-                    else if (data.contains("/img/behavior.gif??node=")) {
+                    // banner点击
+                    else if (data.contains("/img/behavior.gif?node=banner")) {
                         int indexOf = data.indexOf("node=");
+                    }
+                    // icon点击
+                    else if (data.contains("/img/behavior.gif?node=merchant-list-icon")){
+
+                    }
+                    // button点击
+                    else if (data.contains("/img/behavior.gif?node=merchant-list-button")){
+
                     }
 
                 }
 
+                // Referer 当前页url
+                String referer = split[9];
                 // uuid
                 String uuid = split[10];
 
