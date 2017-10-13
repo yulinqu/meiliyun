@@ -62,7 +62,7 @@
 		    <version>3.4</version>
 		</dependency>
 		<!-- ibatis -->
-		<!-- <dependency>  
+		<dependency>  
 		    <groupId>org.apache.ibatis</groupId>  
 		    <artifactId>ibatis-sqlmap</artifactId>  
 		    <version>2.3.0</version>  
@@ -72,7 +72,7 @@
 	        <artifactId>ibatis-core</artifactId>  
 	        <version>3.0</version>  
    		 </dependency>
-   		 
+   		 <!-- 
    		  <dependency>  
 	        <groupId>com.dianping.cat</groupId>  
 	        <artifactId>cat-client</artifactId>
@@ -83,15 +83,14 @@
 		        </exclusion>  
 	        </exclusions>  
 	        <version>1.4.0</version>
-	        
    		 </dependency>  -->
 	
 		<!-- MySql -->
-		<!-- <dependency>
+		 <dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.32</version>
-		</dependency> -->
+		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
@@ -159,11 +158,11 @@
 			<version>3.10.1</version>
 		</dependency> -->
 		
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>
 			<version>8.0.8</version>
-		</dependency> -->
+		</dependency>
 		
 		<!-- hbase -->
     	<!-- <dependency>

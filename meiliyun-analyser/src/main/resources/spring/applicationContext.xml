@@ -33,17 +33,17 @@
 	<!-- 扫描包 -->
 	<context:component-scan base-package="com.meiliyun.analyser"/>
 
-	 <!-- 定义数据源  ucdai-->
-	<!-- <bean id="dataSource_ucdai" class="org.apache.tomcat.jdbc.pool.DataSource"
+	 <!-- 定义数据源  meiliyun-->
+	<bean id="dataSource_meiliyun" class="org.apache.tomcat.jdbc.pool.DataSource"
 		destroy-method="close">
 		数据库驱动
-		<property name="driverClassName" value="${ucdai.jdbc.driverClassName}" />
+		<property name="driverClassName" value="${meiliyun.jdbc.driverClassName}" />
 		相应驱动的jdbcUrl
-		<property name="url" value="${ucdai.jdbc.url}" />
+		<property name="url" value="${meiliyun.jdbc.url}" />
 		数据库的用户名
-		<property name="username" value="${ucdai.jdbc.username}" />
+		<property name="username" value="${meiliyun.jdbc.username}" />
 		数据库的密码
-		<property name="password" value="${ucdai.jdbc.password}" />
+		<property name="password" value="${meiliyun.jdbc.password}" />
 		
 		<property name="initialSize" value="${db.initialSize}" />
 		<property name="maxActive" value="${db.maxActive}" />
@@ -57,12 +57,12 @@
 		<property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
 		<property name="logAbandoned" value="${db.logAbandoned}" />
 		<property name="jdbcInterceptors" value="${db.jdbcInterceptors}" />
-	</bean> -->
+	</bean>
 	
-	<!-- <bean id="sqlMapClient_rscore_ucdai" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
-		<property name="configLocation" value="classpath:/config/sqlMapConfig_rscore_ucdai.xml" />
-		<property name="dataSource" ref="dataSource_ucdai" />
-	</bean> -->
+	<bean id="sqlMapClient_meiliyun" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:/config/sqlMapConfig_meiliyun.xml" />
+		<property name="dataSource" ref="dataSource_meiliyun" />
+	</bean>
 	
 	 <!-- 定义数据源  decision-->
 	<!-- <bean id="dataSource_decision" class="org.apache.tomcat.jdbc.pool.DataSource"
