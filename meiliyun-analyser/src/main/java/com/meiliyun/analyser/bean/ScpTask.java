@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -265,9 +266,7 @@ public class ScpTask {
         }
 
         // 统计每分钟pv uv
-
         List<PvUv> pvuv = new ArrayList<PvUv>();
-
         if (!preMinCount.isEmpty()) {
             Set<String> keys = preMinCount.keySet();
             for (String key : keys) {
@@ -287,6 +286,104 @@ public class ScpTask {
         meiliyunDAO.insertPvuv(pvuv);
 
         // 统计每分钟不同主区域的点击情况
+        List<ProductClickBean> bannerClicks = new ArrayList<ProductClickBean>();
+        List<ProductClickBean> iconClicks = new ArrayList<ProductClickBean>();
+        List<ProductClickBean> buttonClicks = new ArrayList<ProductClickBean>();
+        // banner 点击情况
+        if (!preBannerClick.isEmpty()) {
+            Set<String> times = preBannerClick.keySet();
+            for (String time : times) {
+                Map<String, Map<String, Map<String, List<String>>>> timeMap = preBannerClick.get(time);
+                if (!timeMap.isEmpty()) {
+                    Set<String> urls = timeMap.keySet();
+                    for (String url : urls) {
+                        Map<String, Map<String, List<String>>> positionMap = timeMap.get(url);
+                        if (!positionMap.isEmpty()) {
+                            Set<String> positions = positionMap.keySet();
+                            for (String position : positions) {
+                                Map<String, List<String>> pidMap = positionMap.get(position);
+                                if (!pidMap.isEmpty()) {
+                                    Set<String> pids = pidMap.keySet();
+                                    for (String pid : pids) {
+                                        List<String> list = pidMap.get(pidMap);
+                                        if (CollectionUtils.isNotEmpty(list)) {
+                                            ProductClickBean productClickBean = new ProductClickBean(time, url,
+                                                    "banner", position, pid, list.size());
+                                            bannerClicks.add(productClickBean);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // icon 点击
+        if (!preIconClick.isEmpty()) {
+            Set<String> times = preBannerClick.keySet();
+            for (String time : times) {
+                Map<String, Map<String, Map<String, List<String>>>> timeMap = preBannerClick.get(time);
+                if (!timeMap.isEmpty()) {
+                    Set<String> urls = timeMap.keySet();
+                    for (String url : urls) {
+                        Map<String, Map<String, List<String>>> positionMap = timeMap.get(url);
+                        if (!positionMap.isEmpty()) {
+                            Set<String> positions = positionMap.keySet();
+                            for (String position : positions) {
+                                Map<String, List<String>> pidMap = positionMap.get(position);
+                                if (!pidMap.isEmpty()) {
+                                    Set<String> pids = pidMap.keySet();
+                                    for (String pid : pids) {
+                                        List<String> list = pidMap.get(pidMap);
+                                        if (CollectionUtils.isNotEmpty(list)) {
+                                            ProductClickBean productClickBean = new ProductClickBean(time, url, "icon",
+                                                    position, pid, list.size());
+                                            iconClicks.add(productClickBean);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // button 点击
+        if (!preButtonClick.isEmpty()) {
+            Set<String> times = preBannerClick.keySet();
+            for (String time : times) {
+                Map<String, Map<String, Map<String, List<String>>>> timeMap = preBannerClick.get(time);
+                if (!timeMap.isEmpty()) {
+                    Set<String> urls = timeMap.keySet();
+                    for (String url : urls) {
+                        Map<String, Map<String, List<String>>> positionMap = timeMap.get(url);
+                        if (!positionMap.isEmpty()) {
+                            Set<String> positions = positionMap.keySet();
+                            for (String position : positions) {
+                                Map<String, List<String>> pidMap = positionMap.get(position);
+                                if (!pidMap.isEmpty()) {
+                                    Set<String> pids = pidMap.keySet();
+                                    for (String pid : pids) {
+                                        List<String> list = pidMap.get(pidMap);
+                                        if (CollectionUtils.isNotEmpty(list)) {
+                                            ProductClickBean productClickBean = new ProductClickBean(time, url,
+                                                    "button", position, pid, list.size());
+                                            buttonClicks.add(productClickBean);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        meiliyunDAO.insertPclick(buttonClicks);
+        meiliyunDAO.insertPclick(iconClicks);
+        meiliyunDAO.insertPclick(bannerClicks);
 
     }
 
