@@ -45,22 +45,20 @@ public class MeiliyunDAO extends MeiliyunBaseDAO {
         super.insert("insert_pclick", pclick);
     }
 
-    public List<PvUv> getPvuvByTime(String url, String startTime, String endTime, String timeUnit) throws SQLException {
+    public Object getPvuvByTime(String url, String startTime, String endTime, String timeUnit) throws SQLException {
 
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("start_time", startTime);
         params.put("end_time", endTime);
         params.put("url", url);
-        // params.put("timeUnit",timeUnit);
         if (timeUnit.equalsIgnoreCase("hour"))
-            return super.queryForList("", null);
-        else if (timeUnit.equalsIgnoreCase("minte"))
-            return super.queryForList("", null);
+            return super.queryForObject("get_hour_pvuv", params);
+        else if (timeUnit.equalsIgnoreCase("minute"))
+            return super.queryForObject("get_minute_pvuv", params);
         else if (timeUnit.equalsIgnoreCase("day"))
-            return super.queryForList("", null);
+            return super.queryForObject("get_day_pvuv", params);
         else if (timeUnit.equalsIgnoreCase("month"))
-            return super.queryForList("", null);
-
+            return super.queryForObject("get_month_pvuv", params);
         return null;
 
     }

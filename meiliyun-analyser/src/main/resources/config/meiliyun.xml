@@ -5,9 +5,6 @@
 
 <sqlMap namespace="meiliyun">
     
-   <!--  <select id="" parameterClass="java.util.Map" resultClass="java.lang.String">
-    </select>
-   	 -->
    	<!-- 插入pvuv -->
      <insert id="insert_pvuv" parameterClass="java.util.List">
    		insert into pvuv(time_range,url,pv,uv) values
@@ -27,5 +24,49 @@
 	         ]]>   
 	      </iterate>  
 	</insert>
+	
+	
+	 <select id="get_hour_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+	  <![CDATA[ 
+	 	select 
+	 		str_to_date(time_range, '%Y-%m-%d %H') time_range,
+	 		sum(pv) pv,
+	 		sum(uv) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by str_to_date(time_range, '%Y-%m-%d %H') order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_day_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+	  <![CDATA[ 
+	 	select 
+	 		str_to_date(time_range, '%Y-%m-%d') time_range,
+	 		sum(pv) pv,
+	 		sum(uv) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by str_to_date(time_range, '%Y-%m-%d') order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_month_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+	  <![CDATA[ 
+	 	select 
+	 		str_to_date(time_range, '%Y-%m') time_range,
+	 		sum(pv) pv,
+	 		sum(uv) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by str_to_date(time_range, '%Y-%m') order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_minute_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+	  <![CDATA[ 
+	 	select 
+	 		time_range,
+	 		pv,
+	 		uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time# and url=#url# order by time_range desc
+	 ]]>
+    </select>
     
 </sqlMap>

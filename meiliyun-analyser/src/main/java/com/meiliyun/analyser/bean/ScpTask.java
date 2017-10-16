@@ -81,9 +81,7 @@ public class ScpTask {
                 String reTime = null;
                 if (StringUtils.isNotBlank(requestTime)) {
                     // 14/Oct/2017:06:06:48
-                    String replace = requestTime.replace(" ", "");
-                    int index = replace.lastIndexOf(":");
-                    reTime = replace.substring(0, index - 3);
+                    reTime = formateDate(requestTime);
                 }
                 // 埋点数据
                 String data = split[2];
@@ -408,14 +406,18 @@ public class ScpTask {
     public String formateDate(String dataStr) {
 
         if (StringUtils.isNotBlank(dataStr)) {
-            String[] split = dataStr.replace("/", ":").split(":");
+            String replaceAll = dataStr.replaceAll("Jan", "01").replaceAll("Feb", "02").replaceAll("Mar", "03")
+                    .replaceAll("Apr", "04").replaceAll("May", "05").replaceAll("Jun", "06").replaceAll("Jul", "07")
+                    .replaceAll("Aug", "08").replaceAll("Sep", "09").replaceAll("Oct", "10").replaceAll("Nov", "11")
+                    .replaceAll("Dec", "12");
+
+            String[] split = replaceAll.replaceAll("/", ":").replaceAll(" ", "").split(":");
             String day = split[0];
             String month = split[1];
             String year = split[2];
             String hour = split[3];
             String min = split[4];
-            String second = split[5];
-
+            return year + "-" + month + "-" + day + " " + hour + ":" + min + ":00";
         }
         return null;
 
@@ -424,6 +426,15 @@ public class ScpTask {
     public static void main(String[] args) throws ParseException, IOException, SQLException {
 
         // scpFile();
+        /**
+         * 一月：January 二月：February 三月：March 四月：April 五月：May 六月：June 七月：July 八月：August 九月：September 十月：October
+         * 十一月：November 十二月：December
+         */
+        "".replaceAll("Jan", "01").replaceAll("Feb", "02").replaceAll("Mar", "03").replaceAll("Apr", "04")
+                .replaceAll("May", "05").replaceAll("Jun", "06").replaceAll("Jul", "07").replaceAll("Aug", "08")
+                .replaceAll("Sep", "09").replaceAll("Oct", "10").replaceAll("Nov", "11").replaceAll("Dec", "12");
+
+        // System.out.println(formateDate("14/Oct/2017:06:06:48"));
 
     }
 
