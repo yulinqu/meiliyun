@@ -2,6 +2,8 @@ package com.meiliyun.analyser.controller;
 
 import java.io.File;
 
+import com.meiliyun.analyser.service.AnalyserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,7 +16,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author yulinqu
  */
 @Controller
+@RequestMapping(value="report")
 public class AnalyserController {
+
+    @Autowired
+    private AnalyserService analyserService;
 
     @RequestMapping(value = "analyser", method = RequestMethod.GET)
     public @ResponseBody String analyser(@RequestParam(value = "ad", required = false) String ad,
@@ -28,6 +34,18 @@ public class AnalyserController {
         File scpFile = new File("");
 
         return "1";
+
+    }
+
+    @RequestMapping(value = "pvuv", method = RequestMethod.GET)
+    public @ResponseBody String getPvUv(@RequestParam("startTime") String startTime,
+                                        @RequestParam("endTime") String endTime,
+                                        @RequestParam("url") String url,@RequestParam("staticTimeUnit") String staticTimeUnit){
+
+        // 校验开始时间和结束时间
+        analyserService.getPvuvByUrlAndTime(url,startTime,endTime,staticTimeUnit);
+
+        return null;
 
     }
 
