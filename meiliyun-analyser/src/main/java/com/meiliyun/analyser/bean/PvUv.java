@@ -13,8 +13,9 @@ public class PvUv {
     public PvUv() {
     }
 
-    public PvUv(String timeRange,String url,int pv, int uv) {
-        this.timeRange=timeRange;
+    public PvUv(String timeRange, String url, int pv, int uv) {
+        this.timeRange = timeRange;
+        this.url = url;
         this.pv = pv;
         this.uv = uv;
     }
@@ -50,4 +51,10 @@ public class PvUv {
     public void setUv(int uv) {
         this.uv = uv;
     }
+
+    @Override
+    public String toString() {
+        return "PvUv [timeRange=" + timeRange + ", url=" + url + ", pv=" + pv + ", uv=" + uv + "]";
+    }
+
 }

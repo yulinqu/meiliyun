@@ -3,27 +3,27 @@
         PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
         "http://www.ibatis.com/dtd/sql-map-2.dtd">
 
-<sqlMap namespace=" meiliyun">
+<sqlMap namespace="meiliyun">
     
-    <select id="" parameterClass="java.util.Map" resultClass="java.lang.String">
+   <!--  <select id="" parameterClass="java.util.Map" resultClass="java.lang.String">
     </select>
-   	
+   	 -->
    	<!-- 插入pvuv -->
      <insert id="insert_pvuv" parameterClass="java.util.List">
-   		insert into pvuv( time_range,url,pv,uv) values
-	     <iterate  conjunction =","  open ="("  close =")">   
+   		insert into pvuv(time_range,url,pv,uv) values
+	     <iterate  conjunction =",">   
 		      <![CDATA[  
-	             #pvuv[].timeRange #, #pvuv[].url#, #pvuv[].pv#,#pvuv[].uv#
+	             (#pvuv[].timeRange#, #pvuv[].url#, #pvuv[].pv#,#pvuv[].uv#)
 	         ]]>   
 	      </iterate>  
 	</insert>
 	
 	 <!-- 插入点击数 -->
      <insert id="insert_pclick" parameterClass="java.util.List">
-   		insert into pclick( time_range,url,area,position,pid,count) values
-	     <iterate  conjunction =","  open ="("  close =")">   
+   		insert into pclick(time_range,url,area,position,pid,count) values
+	     <iterate  conjunction =",">   
 		      <![CDATA[  
-	             #pclick[].timeRange#, #pclick[].url#,#pclick[].area#,#pclick[].position#,#pclick[].pid#,#pclick[].count#
+	             (#pclick[].timeRange#, #pclick[].referUrl#,#pclick[].area#,#pclick[].position#,#pclick[].pid#,#pclick[].clickCount#)
 	         ]]>   
 	      </iterate>  
 	</insert>

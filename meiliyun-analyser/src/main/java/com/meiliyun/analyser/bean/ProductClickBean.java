@@ -78,4 +78,10 @@ public class ProductClickBean {
         this.pid = pid;
     }
 
+    @Override
+    public String toString() {
+        return "ProductClickBean [timeRange=" + timeRange + ", referUrl=" + referUrl + ", area=" + area + ", position="
+                + position + ", pid=" + pid + ", clickCount=" + clickCount + "]";
+    }
+
 }

@@ -7,23 +7,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.meiliyun.analyser.dao.MeiliyunDAO;
-import com.meiliyun.analyser.utils.ScpUtils;
 
 /**
  * 每天定时去nginx服务器scp文件到本地
@@ -38,23 +34,26 @@ public class ScpTask {
     @Autowired
     private MeiliyunDAO meiliyunDAO;
 
-    public static final String DEFAULT_LOG_FILE_NAME = "access.log";
+    public static final String DEFAULT_LOG_FILE_NAME = "C:/Users/yulinqu/Desktop/access.log";
 
     public void scpFile() throws IOException, SQLException {
 
         // 远程服务器的文件名
-        String fileName = DEFAULT_LOG_FILE_NAME + getCurrentDate();
+        // String fileName = DEFAULT_LOG_FILE_NAME + getCurrentDate();
 
-        String remoteServerIp = config.getRemoteFileHsot();
-        String remoteSeverHostname = config.getRemoteSeverUserName();
-        String remoteSeverPassword = config.getRemoteSeverPwd();
-        String remoteFilePath = config.getRemoteFilePath() + fileName;
-        String localPath = config.getLocalFilePath();
+        // String remoteServerIp = config.getRemoteFileHsot();
+        // String remoteSeverHostname = config.getRemoteSeverUserName();
+        // String remoteSeverPassword = config.getRemoteSeverPwd();
+        // String remoteFilePath = config.getRemoteFilePath() + fileName;
+        // String localPath = config.getLocalFilePath();
         // 1.从远程服务器 scp 文件到本地服务器
-        ScpUtils.scpFileFromRemoteSever(remoteServerIp, remoteSeverHostname, remoteSeverPassword, remoteFilePath,
-                localPath);
+        // ScpUtils.scpFileFromRemoteSever(remoteServerIp, remoteSeverHostname, remoteSeverPassword, remoteFilePath,
+        // localPath);
         // 复制到本地的日志文件
-        File localFile = new File(localPath + fileName);
+        // File localFile = new File(localPath + fileName);
+        System.out.println("start to analyser---");
+
+        File localFile = new File(DEFAULT_LOG_FILE_NAME);
         if (!localFile.exists()) {
             return;
         }
@@ -68,17 +67,13 @@ public class ScpTask {
         Map<String, Map<String, Map<String, Map<String, List<String>>>>> preIconClick = new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>();
         Map<String, Map<String, Map<String, Map<String, List<String>>>>> preButtonClick = new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>();
 
-        // Map<String, Map<String, List<String>>> preBannerClick = new HashMap<String, Map<String, List<String>>>();
-        // Map<String, Map<String, List<String>>> preIconClick = new HashMap<String, Map<String, List<String>>>();
-        // Map<String, Map<String, List<String>>> preButtonClick = new HashMap<String, Map<String, List<String>>>();
-
         // 2.分析文件 按照每分钟的来统计 解析日志文件
         if (localFile.isFile() && localFile.exists()) { // 判断文件是否存在
             InputStreamReader read = new InputStreamReader(new FileInputStream(localFile));// 考虑到编码格式
             BufferedReader bufferedReader = new BufferedReader(read);
             String lineTxt = null;
             while ((lineTxt = bufferedReader.readLine()) != null) {
-                String[] split = lineTxt.split("|");
+                String[] split = lineTxt.split("\\|");
                 // 请求ip
                 String ip = split[0];
                 // 请求时间
@@ -88,41 +83,36 @@ public class ScpTask {
                     // 14/Oct/2017:06:06:48
                     String replace = requestTime.replace(" ", "");
                     int index = replace.lastIndexOf(":");
-
-                    reTime = replace.substring(0, index);
-
-                    // pvuv
-                    if (preMinCount.get(reTime) == null) {
-                        preMinCount.put(reTime, new HashMap<String, List<String>>());
-                    }
-                    // banner 统计
-                    if (preBannerClick.get(reTime) == null) {
-                        preBannerClick.put(reTime, new HashMap<String, Map<String, Map<String, List<String>>>>());
-                    }
-                    // icon 点击
-                    if (preIconClick.get(reTime) == null) {
-                        preIconClick.put(reTime, new HashMap<String, Map<String, Map<String, List<String>>>>());
-                    }
-                    // button 点击
-                    if (preButtonClick.get(reTime) == null) {
-                        preButtonClick.put(reTime, new HashMap<String, Map<String, Map<String, List<String>>>>());
-                    }
-
+                    reTime = replace.substring(0, index - 3);
                 }
                 // 埋点数据
                 String data = split[2];
                 if (StringUtils.isNotBlank(data) && data.contains("/img/behavior.gif?")) {
                     // uuid
-                    String uuidOri = split[10];
-                    // 取出 uuid
-                    String uuid = uuidOri.substring(uuidOri.indexOf("UUID="), uuidOri.indexOf("UUID=") + 32);
+                    String uuidOri = split[10].replace(" ", "");
+                    ;
+                    String[] cookies = uuidOri.split(";");
+                    String uuid = "UUID";
+                    for (String cookie : cookies) {
+                        if (cookie.contains("UUID")) {
+                            // 取出 uuid
+                            uuid = cookie.substring(cookie.indexOf("=") + 1, cookie.indexOf("=") + 33);
+                        }
+                    }
 
                     // Referer 当前页url http://www.xianjinshijie.com:8090/show_list_page.do
-                    // String referer = split[9];
-                    String url = split[9].split("/")[1];
+                    String referer = split[8].replaceAll(" ", "");
+                    String url = "show_list_page.do";
+                    if (referer.indexOf("/") != -1) {
+                        url = referer.split("/")[1];
+                    }
 
                     // 访问list_page
                     if (data.contains("/img/behavior.gif?rnd=")) {
+                        // pvuv
+                        if (preMinCount.get(reTime) == null) {
+                            preMinCount.put(reTime, new HashMap<String, List<String>>());
+                        }
 
                         if (StringUtils.isNotBlank(url)) {
                             if (preMinCount.get(reTime).get(url) != null) {
@@ -140,11 +130,17 @@ public class ScpTask {
                         if (data.contains("/img/behavior.gif?node=")) {
 
                             int index = data.indexOf("msg=");
-                            String pid_position = data.substring(index, index + 34);
+                            String pid_position = data.substring(index + 4, index + 38);
                             String position = pid_position.split("-")[0];
                             String pid = pid_position.split("-")[1];
 
                             if (data.contains("/img/behavior.gif?node=banner")) {
+                                // banner 统计
+                                if (preBannerClick.get(reTime) == null) {
+                                    preBannerClick.put(reTime,
+                                            new HashMap<String, Map<String, Map<String, List<String>>>>());
+                                }
+
                                 // 各产品每分钟的点击情况<time,<url,<position,Map<pid,count>>>>
                                 if (StringUtils.isNotBlank(url)) {
                                     if (preBannerClick.get(reTime).get(url) != null) {
@@ -184,6 +180,11 @@ public class ScpTask {
                             // icon点击
                             else if (data.contains("/img/behavior.gif?node=merchant-list-icon")) {
 
+                                if (preIconClick.get(reTime) == null) {
+                                    preIconClick.put(reTime,
+                                            new HashMap<String, Map<String, Map<String, List<String>>>>());
+                                }
+
                                 if (StringUtils.isNotBlank(url)) {
                                     if (preIconClick.get(reTime).get(url) != null) {
 
@@ -221,6 +222,11 @@ public class ScpTask {
                             }
                             // button点击
                             else if (data.contains("/img/behavior.gif?node=merchant-list-button")) {
+
+                                if (preButtonClick.get(reTime) == null) {
+                                    preButtonClick.put(reTime,
+                                            new HashMap<String, Map<String, Map<String, List<String>>>>());
+                                }
 
                                 if (StringUtils.isNotBlank(url)) {
                                     if (preButtonClick.get(reTime).get(url) != null) {
@@ -305,7 +311,7 @@ public class ScpTask {
                                 if (!pidMap.isEmpty()) {
                                     Set<String> pids = pidMap.keySet();
                                     for (String pid : pids) {
-                                        List<String> list = pidMap.get(pidMap);
+                                        List<String> list = pidMap.get(pid);
                                         if (CollectionUtils.isNotEmpty(list)) {
                                             ProductClickBean productClickBean = new ProductClickBean(time, url,
                                                     "banner", position, pid, list.size());
@@ -321,9 +327,9 @@ public class ScpTask {
         }
         // icon 点击
         if (!preIconClick.isEmpty()) {
-            Set<String> times = preBannerClick.keySet();
+            Set<String> times = preIconClick.keySet();
             for (String time : times) {
-                Map<String, Map<String, Map<String, List<String>>>> timeMap = preBannerClick.get(time);
+                Map<String, Map<String, Map<String, List<String>>>> timeMap = preIconClick.get(time);
                 if (!timeMap.isEmpty()) {
                     Set<String> urls = timeMap.keySet();
                     for (String url : urls) {
@@ -335,7 +341,7 @@ public class ScpTask {
                                 if (!pidMap.isEmpty()) {
                                     Set<String> pids = pidMap.keySet();
                                     for (String pid : pids) {
-                                        List<String> list = pidMap.get(pidMap);
+                                        List<String> list = pidMap.get(pid);
                                         if (CollectionUtils.isNotEmpty(list)) {
                                             ProductClickBean productClickBean = new ProductClickBean(time, url, "icon",
                                                     position, pid, list.size());
@@ -352,9 +358,9 @@ public class ScpTask {
 
         // button 点击
         if (!preButtonClick.isEmpty()) {
-            Set<String> times = preBannerClick.keySet();
+            Set<String> times = preButtonClick.keySet();
             for (String time : times) {
-                Map<String, Map<String, Map<String, List<String>>>> timeMap = preBannerClick.get(time);
+                Map<String, Map<String, Map<String, List<String>>>> timeMap = preButtonClick.get(time);
                 if (!timeMap.isEmpty()) {
                     Set<String> urls = timeMap.keySet();
                     for (String url : urls) {
@@ -366,7 +372,7 @@ public class ScpTask {
                                 if (!pidMap.isEmpty()) {
                                     Set<String> pids = pidMap.keySet();
                                     for (String pid : pids) {
-                                        List<String> list = pidMap.get(pidMap);
+                                        List<String> list = pidMap.get(pid);
                                         if (CollectionUtils.isNotEmpty(list)) {
                                             ProductClickBean productClickBean = new ProductClickBean(time, url,
                                                     "button", position, pid, list.size());
@@ -380,6 +386,8 @@ public class ScpTask {
                 }
             }
         }
+
+        System.out.println("---------");
 
         meiliyunDAO.insertPclick(buttonClicks);
         meiliyunDAO.insertPclick(iconClicks);
@@ -413,18 +421,9 @@ public class ScpTask {
 
     }
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, IOException, SQLException {
 
-        System.out.println(UUID.randomUUID().toString().replace("-", "").length());
-
-        Date date = new Date();
-        System.out.println(date);
-
-        System.out.println("000000005ef28a09015ef28fd5a50002".length());
-
-        String datastr = "14/Oct/2017:06:06:48";
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date parse = formatter.parse(datastr);
+        // scpFile();
 
     }
 
