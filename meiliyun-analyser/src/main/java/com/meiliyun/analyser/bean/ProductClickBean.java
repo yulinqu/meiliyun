@@ -13,16 +13,20 @@ public class ProductClickBean {
 
     private String position;
 
+    private String pid;
+
     private int clickCount;
 
     public ProductClickBean() {
     }
 
-    public ProductClickBean(String timeRange, String referUrl, String area, String position, int clickCount) {
+    public ProductClickBean(String timeRange, String referUrl, String area, String position, String pid,
+            int clickCount) {
         this.timeRange = timeRange;
         this.referUrl = referUrl;
         this.area = area;
         this.position = position;
+        this.pid = pid;
         this.clickCount = clickCount;
     }
 
@@ -65,4 +69,13 @@ public class ProductClickBean {
     public void setClickCount(int clickCount) {
         this.clickCount = clickCount;
     }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
+    }
+
 }
