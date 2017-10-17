@@ -27,7 +27,7 @@
 	
 	<bean id="scpTask" class="com.meiliyun.analyser.bean.ScpTask" />  
    	<task:scheduled-tasks>  
-       	<task:scheduled ref="scpTask" method="scpFile" cron="0 0 1 * * ?" />
+       	<task:scheduled ref="scpTask" method="scpFile" cron="${scp.time.tigger}" />
    	</task:scheduled-tasks>  
 	
 	<!-- 扫描包 -->
