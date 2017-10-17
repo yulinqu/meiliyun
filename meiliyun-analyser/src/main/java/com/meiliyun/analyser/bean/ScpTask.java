@@ -40,12 +40,24 @@ public class ScpTask {
 
     public static final String DEFAULT_LOG_FILE_NAME_SUFFIX = ".log";
 
+    public static String TEST_DATA=null;
+
     private static Logger LOGGER = Logger.getLogger(ScpTask.class);
+
+    public void scpFileForTest(String data) throws IOException, SQLException{
+        TEST_DATA=data;
+        scpFile();
+        TEST_DATA=null;
+    }
+
 
     public void scpFile() throws IOException, SQLException {
 
         // 远程服务器的文件名
         String fileName = DEFAULT_LOG_FILE_NAME + getCurrentDate() + DEFAULT_LOG_FILE_NAME_SUFFIX;
+        if(StringUtils.isNotBlank(TEST_DATA)){
+            fileName = DEFAULT_LOG_FILE_NAME + TEST_DATA + DEFAULT_LOG_FILE_NAME_SUFFIX;
+        }
 
         String remoteServerIp = config.getRemoteFileHsot();
         String remoteSeverHostname = config.getRemoteSeverUserName();
@@ -135,8 +147,15 @@ public class ScpTask {
 
                             int index = data.indexOf("msg=");
                             String pid_position = data.substring(index + 4, index + 38);
-                            String position = pid_position.split("-")[0];
-                            String pid = pid_position.split("-")[1];
+                            String position="1";
+                            String pid="";
+                            if(pid_position.indexOf("-")!=-1){
+                                position = pid_position.split("-")[0];
+                                pid = pid_position.split("-")[1];
+                            }else{
+                                pid=data.substring(index + 4, index + 36);
+                            }
+
 
                             if (data.contains("/img/behavior.gif?node=banner")) {
                                 // banner 统计

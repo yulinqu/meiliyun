@@ -30,6 +30,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') time_range,
+	 		str_to_date(time_range, '%Y-%m-%d %H') time_range_date,
 	 		#url# url,
 	 		sum(pv) pv,
 	 		sum(uv) uv
@@ -42,6 +43,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m-%d') time_range,
+	 		str_to_date(time_range, '%Y-%m-%d') time_range_date,
 	 		#url# url,
 	 		sum(pv) pv,
 	 		sum(uv) uv
@@ -54,6 +56,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m'),'%Y-%m') time_range,
+	 		str_to_date(time_range, '%Y-%m') time_range_date,
 	 		#url# url,
 	 		sum(pv) pv,
 	 		sum(uv) uv
@@ -89,6 +92,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') time_range,
+	 		str_to_date(t1.time_range, '%Y-%m-%d %H') time_range_date,
 	 		#ad# as advertisment,
 	 		#url# as url,
 	 		AREA,
@@ -105,6 +109,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') time_range,
+	 		str_to_date(t1.time_range, '%Y-%m-%d %H') time_range_dare,
 	 		#ad# as advertisment,
 	 		#url# as url,
 	 		t1.AREA,
@@ -121,6 +126,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') time_range,
+	 		str_to_date(t1.time_range, '%Y-%m-%d') time_range_date,
 	 		#ad# as advertisment,
 	 		#url# as url,
 	 		AREA,
@@ -137,6 +143,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') time_range,
+	 		str_to_date(t1.time_range, '%Y-%m-%d') time_range_date,
 	 		#ad# as advertisment,
 	 		#url# as url,
 	 		t1.AREA,
@@ -154,6 +161,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m'),'%Y-%m') time_range,
+	 		str_to_date(t1.time_range, '%Y-%m') time_range_date,
 	 		#ad# as advertisment,
 	 		#url# as url,
 	 		AREA,
@@ -171,6 +179,7 @@
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m'),'%Y-%m') time_range,
+	 		str_to_date(t1.time_range, '%Y-%m') time_range_date,
 	 		#ad# as advertisment,
 	 		#url# as url,
 	 		t1.AREA,

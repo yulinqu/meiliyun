@@ -1,15 +1,16 @@
 package com.meiliyun.analyser.controller;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import com.meiliyun.analyser.bean.ScpTask;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.meiliyun.analyser.service.AnalyserService;
@@ -25,6 +26,10 @@ public class AnalyserController {
 
     @Autowired
     private AnalyserService analyserService;
+    @Autowired
+    private ScpTask  scpTask;
+
+    private static Logger LOGGER = Logger.getLogger(AnalyserController.class);
 
     @RequestMapping(value = "clicks", method = RequestMethod.GET)
     public ModelAndView analyser(@RequestParam(value = "ad", required = false) String ad,
@@ -43,7 +48,8 @@ public class AnalyserController {
             modelAndView.addObject("status", "成功");
             modelAndView.addObject("querytime", startTime + "至" + endTime);
             return modelAndView;
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            LOGGER.error("get clicks error !", e );
             modelAndView.addObject("status", "失败");
             modelAndView.addObject("querytime", startTime + "至" + endTime);
             return modelAndView;
@@ -64,12 +70,25 @@ public class AnalyserController {
             modelAndView.addObject("status", "成功");
             modelAndView.addObject("querytime", startTime + "至" + endTime);
             return modelAndView;
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            LOGGER.error("get pvuv error !", e );
             modelAndView.addObject("status", "失败");
             modelAndView.addObject("querytime", startTime + "至" + endTime);
             return modelAndView;
         }
 
     }
+
+    @RequestMapping(value = "scp_file", method = RequestMethod.GET)
+    public @ResponseBody String test(@RequestParam("test_date") String testDate){
+        try {
+            scpTask.scpFileForTest(testDate);
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error";
+        }
+    }
+
 
 }
