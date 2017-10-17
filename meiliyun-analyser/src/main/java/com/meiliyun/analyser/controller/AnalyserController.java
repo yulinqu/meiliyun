@@ -1,5 +1,6 @@
 package com.meiliyun.analyser.controller;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,15 +34,20 @@ public class AnalyserController {
         if (StringUtils.isBlank(ad)) {
             ad = "all";
         }
-
-        List<Map<String, Object>> clickCountByTime = analyserService.getClickCountByTime(url, startTime, endTime,
-                staticTimeUnit, ad);
-
         ModelAndView modelAndView = new ModelAndView("clicks");
-        modelAndView.addObject("clicks", clickCountByTime);
-        modelAndView.addObject("status", "成功");
-        modelAndView.addObject("querytime", startTime + "-" + endTime);
-        return modelAndView;
+        try {
+            List<Map<String, Object>> clickCountByTime = analyserService.getClickCountByTime(url, startTime, endTime,
+                    staticTimeUnit, ad);
+
+            modelAndView.addObject("clicks", clickCountByTime);
+            modelAndView.addObject("status", "成功");
+            modelAndView.addObject("querytime", startTime + "至" + endTime);
+            return modelAndView;
+        } catch (SQLException e) {
+            modelAndView.addObject("status", "失败");
+            modelAndView.addObject("querytime", startTime + "至" + endTime);
+            return modelAndView;
+        }
     }
 
     @RequestMapping(value = "pvuv", method = RequestMethod.GET)
@@ -49,14 +55,20 @@ public class AnalyserController {
             @RequestParam("url") String url, @RequestParam("staticTimeUnit") String staticTimeUnit) {
 
         // 校验开始时间和结束时间
-        List<Map<String, Object>> pvuvByUrlAndTime = analyserService.getPvuvByUrlAndTime(url, startTime, endTime,
-                staticTimeUnit);
-
         ModelAndView modelAndView = new ModelAndView("pvuv");
-        modelAndView.addObject("pvuv", pvuvByUrlAndTime);
-        modelAndView.addObject("status", "成功");
+        try {
+            List<Map<String, Object>> pvuvByUrlAndTime = analyserService.getPvuvByUrlAndTime(url, startTime, endTime,
+                    staticTimeUnit);
 
-        return modelAndView;
+            modelAndView.addObject("pvuv", pvuvByUrlAndTime);
+            modelAndView.addObject("status", "成功");
+            modelAndView.addObject("querytime", startTime + "至" + endTime);
+            return modelAndView;
+        } catch (SQLException e) {
+            modelAndView.addObject("status", "失败");
+            modelAndView.addObject("querytime", startTime + "至" + endTime);
+            return modelAndView;
+        }
 
     }
 

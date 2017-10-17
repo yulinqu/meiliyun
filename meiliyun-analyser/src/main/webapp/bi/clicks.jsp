@@ -14,29 +14,29 @@
 </head>
 <body>
 	<h1>点击数统计报表</h1>
-	<h3>查询状态 : </h3> 
-	<h3>查询时间:</h3>
-	
-	<table style="width:60%;border:1px black solid">  
-	    <tr style="border:1px black solid">  
-	        <th style="text-align: center">时间段</th>  
-	        <th style="text-align: center">URL</th>
-	        <th style="text-align: center">广告</th>  
-	        <th style="text-align: center">大区域</th> 
-	        <th style="text-align: center">位置</th>  
-	        <th style="text-align: center">点击数</th>   
-	    </tr>  
-	    <c:forEach items="${clicks}" var="row" >  
-	        <tr style="border:1px black solid">  
-	            <td align="center">${row.time_range}</td>
-	            <td align="center">${row.url}</td>  
-	            <td align="center">${row.advertisment}</td>  
-	            <td align="center">${row.AREA}</td>  
-	            <td align="center">${row.POSITION}</td>  
-	            <td align="center">${row.totalCount}</td>    
-	        </tr>  
-	    </c:forEach>  
-	</table>  
-     
+	<h3>查询状态 : ${status}</h3> 
+	<h3>查询时间 : ${querytime}</h3>
+	<c:if test="${status=='成功'}">
+		<table style="width:60%;border:1px black solid">  
+		    <tr style="border:1px black solid">  
+		        <th style="text-align: center">时间段</th>  
+		        <th style="text-align: center">URL</th>
+		        <th style="text-align: center">广告</th>  
+		        <th style="text-align: center">大区域</th> 
+		        <th style="text-align: center">位置</th>  
+		        <th style="text-align: center">点击数</th>   
+		    </tr>  
+		    <c:forEach items="${clicks}" var="row" >  
+		        <tr style="border:1px black solid">  
+		            <td align="center">${row.time_range}</td>
+		            <td align="center">${row.url}</td>  
+		            <td align="center">${row.advertisment}</td>  
+		            <td align="center">${row.AREA}</td>  
+		            <td align="center">${row.POSITION}</td>  
+		            <td align="center">${row.totalCount}</td>    
+		        </tr>  
+		    </c:forEach>  
+		</table>  
+    </c:if>
 </body>
 </html>

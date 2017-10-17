@@ -29,7 +29,7 @@
 	 <select id="get_hour_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
-	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H') time_range,
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') time_range,
 	 		#url# url,
 	 		sum(pv) pv,
 	 		sum(uv) uv

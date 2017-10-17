@@ -15,32 +15,17 @@ public class AnalyserService {
     @Autowired
     private MeiliyunDAO meiliyunDAO;
 
-    public List<Map<String, Object>> getPvuvByUrlAndTime(String url, String startTime, String endTime,
-            String timeUnit) {
-        try {
-
-            List<Map<String, Object>> pvuvByTime = meiliyunDAO.getPvuvByTime(url, startTime, endTime, timeUnit);
-
-            return pvuvByTime;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-
+    public List<Map<String, Object>> getPvuvByUrlAndTime(String url, String startTime, String endTime, String timeUnit)
+            throws SQLException {
+        List<Map<String, Object>> pvuvByTime = meiliyunDAO.getPvuvByTime(url, startTime, endTime, timeUnit);
+        return pvuvByTime;
     }
 
     public List<Map<String, Object>> getClickCountByTime(String url, String startTime, String endTime, String timeUnit,
-            String advertisment) {
-
-        try {
-            List<Map<String, Object>> clickCount = meiliyunDAO.getClickCount(url, startTime, endTime, timeUnit,
-                    advertisment);
-            return clickCount;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-
+            String advertisment) throws SQLException {
+        List<Map<String, Object>> clickCount = meiliyunDAO.getClickCount(url, startTime, endTime, timeUnit,
+                advertisment);
+        return clickCount;
     }
 
 }
