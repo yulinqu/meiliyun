@@ -45,22 +45,68 @@ public class MeiliyunDAO extends MeiliyunBaseDAO {
         super.insert("insert_pclick", pclick);
     }
 
-    public Object getPvuvByTime(String url, String startTime, String endTime, String timeUnit) throws SQLException {
+    public List<Map<String, Object>> getPvuvByTime(String url, String startTime, String endTime, String timeUnit)
+            throws SQLException {
 
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("start_time", startTime);
         params.put("end_time", endTime);
         params.put("url", url);
         if (timeUnit.equalsIgnoreCase("hour"))
-            return super.queryForObject("get_hour_pvuv", params);
+            return super.queryForList("get_hour_pvuv", params);
         else if (timeUnit.equalsIgnoreCase("minute"))
-            return super.queryForObject("get_minute_pvuv", params);
+            return super.queryForList("get_minute_pvuv", params);
         else if (timeUnit.equalsIgnoreCase("day"))
-            return super.queryForObject("get_day_pvuv", params);
+            return super.queryForList("get_day_pvuv", params);
+        else if (timeUnit.equalsIgnoreCase("week"))
+            return super.queryForList("get_week_pvuv", params);
         else if (timeUnit.equalsIgnoreCase("month"))
-            return super.queryForObject("get_month_pvuv", params);
+            return super.queryForList("get_month_pvuv", params);
         return null;
 
+    }
+
+    public List<Map<String, Object>> getClickCount(String url, String startTime, String endTime, String timeUnit,
+            String advertisment) throws SQLException {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("start_time", startTime);
+        params.put("end_time", endTime);
+        params.put("url", url);
+        params.put("ad", advertisment);
+
+        if (timeUnit.equalsIgnoreCase("hour")) {
+
+            if (advertisment.equalsIgnoreCase("all")) {
+                return super.queryForList("get_hour_click_all", params);
+            }
+            return super.queryForList("get_hour_click", params);
+        } else if (timeUnit.equalsIgnoreCase("minute")) {
+
+            if (advertisment.equalsIgnoreCase("all")) {
+                return super.queryForList("get_minute_click_all", params);
+            }
+            return super.queryForList("get_minute_click", params);
+        } else if (timeUnit.equalsIgnoreCase("day")) {
+
+            if (advertisment.equalsIgnoreCase("all")) {
+                return super.queryForList("get_day_click_all", params);
+            }
+            return super.queryForList("get_day_click", params);
+        } else if (timeUnit.equalsIgnoreCase("week")) {
+
+            if (advertisment.equalsIgnoreCase("all")) {
+                return super.queryForList("get_week_click_all", params);
+            }
+            return super.queryForList("get_week_click", params);
+
+        } else if (timeUnit.equalsIgnoreCase("month")) {
+            if (advertisment.equalsIgnoreCase("all")) {
+                return super.queryForList("get_month_click_all", params);
+            }
+            return super.queryForList("get_month_click", params);
+        }
+
+        return null;
     }
 
 }

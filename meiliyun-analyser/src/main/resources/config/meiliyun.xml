@@ -26,10 +26,11 @@
 	</insert>
 	
 	
-	 <select id="get_hour_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+	 <select id="get_hour_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
-	 		str_to_date(time_range, '%Y-%m-%d %H') time_range,
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H') time_range,
+	 		#url# url,
 	 		sum(pv) pv,
 	 		sum(uv) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
@@ -37,10 +38,11 @@
 	 ]]>
     </select>
     
-    <select id="get_day_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+    <select id="get_day_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
-	 		str_to_date(time_range, '%Y-%m-%d') time_range,
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m-%d') time_range,
+	 		#url# url,
 	 		sum(pv) pv,
 	 		sum(uv) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
@@ -48,10 +50,11 @@
 	 ]]>
     </select>
     
-    <select id="get_month_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+    <select id="get_month_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
-	 		str_to_date(time_range, '%Y-%m') time_range,
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m'),'%Y-%m') time_range,
+	 		#url# url,
 	 		sum(pv) pv,
 	 		sum(uv) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
@@ -59,14 +62,192 @@
 	 ]]>
     </select>
     
-    <select id="get_minute_pvuv" parameterClass="java.util.Map" resultClass="java.util.Map">
+    <select id="get_week_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') time_range,
+	 		#url# url,
+	 		sum(pv) pv,
+	 		sum(uv) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_minute_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
 	 		time_range,
+	 		#url# url,
 	 		pv,
 	 		uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time# and url=#url# order by time_range desc
 	 ]]>
     </select>
+    
+     <select id="get_hour_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 left join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by str_to_date(t1.time_range, '%Y-%m-%d %H'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_hour_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by str_to_date(t1.time_range, '%Y-%m-%d %H'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_day_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 left join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by str_to_date(t1.time_range, '%Y-%m-%d'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_day_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by str_to_date(t1.time_range, '%Y-%m-%d'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    
+    <select id="get_month_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m'),'%Y-%m') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 left join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by str_to_date(t1.time_range, '%Y-%m'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    
+    <select id="get_month_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m'),'%Y-%m') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by str_to_date(t1.time_range, '%Y-%m'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    
+    <select id="get_week_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 left join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    <select id="get_week_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u'),t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+     <select id="get_minute_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		t1.time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1 left join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad# group by t1.time_range,t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
+    
+     <select id="get_minute_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		t1.time_range,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by t1.time_range,t1.AREA,t1.POSITION
+	 	order by time_range desc
+	 ]]>
+    </select>
+    
     
 </sqlMap>

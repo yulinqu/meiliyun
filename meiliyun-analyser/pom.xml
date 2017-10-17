@@ -84,7 +84,27 @@
 	        </exclusions>  
 	        <version>1.4.0</version>
    		 </dependency>  -->
-	
+		
+		<!-- jsp/servlet -->
+       <!-- web依赖包 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		
 		<!-- MySql -->
 		 <dependency>
 			<groupId>mysql</groupId>

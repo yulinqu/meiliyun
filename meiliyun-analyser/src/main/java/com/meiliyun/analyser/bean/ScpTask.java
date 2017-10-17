@@ -87,22 +87,18 @@ public class ScpTask {
                 String data = split[2];
                 if (StringUtils.isNotBlank(data) && data.contains("/img/behavior.gif?")) {
                     // uuid
-                    String uuidOri = split[10].replace(" ", "");
-                    ;
-                    String[] cookies = uuidOri.split(";");
+                    String uuidOri = split[9].replace(" ", "");
                     String uuid = "UUID";
-                    for (String cookie : cookies) {
-                        if (cookie.contains("UUID")) {
-                            // 取出 uuid
-                            uuid = cookie.substring(cookie.indexOf("=") + 1, cookie.indexOf("=") + 33);
-                        }
+                    if (StringUtils.isNotBlank(uuidOri)) {
+                        uuid = uuidOri;
                     }
+                    ;
 
                     // Referer 当前页url http://www.xianjinshijie.com:8090/show_list_page.do
                     String referer = split[8].replaceAll(" ", "");
                     String url = "show_list_page.do";
-                    if (referer.indexOf("/") != -1) {
-                        url = referer.split("/")[1];
+                    if (referer.indexOf("8443/") != -1) {
+                        url = referer.split("8443/")[1];
                     }
 
                     // 访问list_page
@@ -139,6 +135,9 @@ public class ScpTask {
                                             new HashMap<String, Map<String, Map<String, List<String>>>>());
                                 }
 
+                                if (data.contains("/img/behavior.gif?node=banner-new")) {
+                                    url = url + "_new";
+                                }
                                 // 各产品每分钟的点击情况<time,<url,<position,Map<pid,count>>>>
                                 if (StringUtils.isNotBlank(url)) {
                                     if (preBannerClick.get(reTime).get(url) != null) {
@@ -183,6 +182,10 @@ public class ScpTask {
                                             new HashMap<String, Map<String, Map<String, List<String>>>>());
                                 }
 
+                                if (data.contains("/img/behavior.gif?node=merchant-list-icon-new")) {
+                                    url = url + "_new";
+                                }
+
                                 if (StringUtils.isNotBlank(url)) {
                                     if (preIconClick.get(reTime).get(url) != null) {
 
@@ -224,6 +227,10 @@ public class ScpTask {
                                 if (preButtonClick.get(reTime) == null) {
                                     preButtonClick.put(reTime,
                                             new HashMap<String, Map<String, Map<String, List<String>>>>());
+                                }
+
+                                if (data.contains("/img/behavior.gif?node=merchant-list-button-new")) {
+                                    url = url + "_new";
                                 }
 
                                 if (StringUtils.isNotBlank(url)) {
@@ -434,7 +441,7 @@ public class ScpTask {
                 .replaceAll("May", "05").replaceAll("Jun", "06").replaceAll("Jul", "07").replaceAll("Aug", "08")
                 .replaceAll("Sep", "09").replaceAll("Oct", "10").replaceAll("Nov", "11").replaceAll("Dec", "12");
 
-        // System.out.println(formateDate("14/Oct/2017:06:06:48"));
+        System.out.println("https://www.xianjinshijie.com:8443/show_list_page.do".split("8443/")[1]);
 
     }
 

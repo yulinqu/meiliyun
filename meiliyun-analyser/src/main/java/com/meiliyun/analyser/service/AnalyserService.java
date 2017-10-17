@@ -1,6 +1,8 @@
 package com.meiliyun.analyser.service;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,10 +15,27 @@ public class AnalyserService {
     @Autowired
     private MeiliyunDAO meiliyunDAO;
 
-    public Object getPvuvByUrlAndTime(String url, String startTime, String endTime, String timeUnit) {
+    public List<Map<String, Object>> getPvuvByUrlAndTime(String url, String startTime, String endTime,
+            String timeUnit) {
+        try {
+
+            List<Map<String, Object>> pvuvByTime = meiliyunDAO.getPvuvByTime(url, startTime, endTime, timeUnit);
+
+            return pvuvByTime;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    public List<Map<String, Object>> getClickCountByTime(String url, String startTime, String endTime, String timeUnit,
+            String advertisment) {
 
         try {
-            Object pvuvByTime = meiliyunDAO.getPvuvByTime(url, startTime, endTime, timeUnit);
+            List<Map<String, Object>> clickCount = meiliyunDAO.getClickCount(url, startTime, endTime, timeUnit,
+                    advertisment);
+            return clickCount;
         } catch (SQLException e) {
             e.printStackTrace();
         }
