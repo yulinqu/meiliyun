@@ -17,9 +17,11 @@ import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.meiliyun.analyser.dao.MeiliyunDAO;
+import com.meiliyun.analyser.utils.ScpUtils;
 
 /**
  * 每天定时去nginx服务器scp文件到本地
@@ -34,26 +36,34 @@ public class ScpTask {
     @Autowired
     private MeiliyunDAO meiliyunDAO;
 
-    public static final String DEFAULT_LOG_FILE_NAME = "C:/Users/yulinqu/Desktop/access.log";
+    public static final String DEFAULT_LOG_FILE_NAME = "access-";
+
+    public static final String DEFAULT_LOG_FILE_NAME_SUFFIX = ".log";
+
+    private static Logger LOGGER = Logger.getLogger(ScpTask.class);
 
     public void scpFile() throws IOException, SQLException {
 
         // 远程服务器的文件名
-        // String fileName = DEFAULT_LOG_FILE_NAME + getCurrentDate();
+        String fileName = DEFAULT_LOG_FILE_NAME + getCurrentDate() + DEFAULT_LOG_FILE_NAME_SUFFIX;
 
-        // String remoteServerIp = config.getRemoteFileHsot();
-        // String remoteSeverHostname = config.getRemoteSeverUserName();
-        // String remoteSeverPassword = config.getRemoteSeverPwd();
-        // String remoteFilePath = config.getRemoteFilePath() + fileName;
-        // String localPath = config.getLocalFilePath();
+        String remoteServerIp = config.getRemoteFileHsot();
+        String remoteSeverHostname = config.getRemoteSeverUserName();
+        String remoteSeverPassword = config.getRemoteSeverPwd();
+        String remoteFilePath = config.getRemoteFilePath() + fileName;
+        String localPath = config.getLocalFilePath();
         // 1.从远程服务器 scp 文件到本地服务器
-        // ScpUtils.scpFileFromRemoteSever(remoteServerIp, remoteSeverHostname, remoteSeverPassword, remoteFilePath,
-        // localPath);
+        try {
+            ScpUtils.scpFileFromRemoteSever(remoteServerIp, remoteSeverHostname, remoteSeverPassword, remoteFilePath,
+                    localPath);
+            LOGGER.info("from remote server scp file : " + fileName + " success !");
+        } catch (Exception e) {
+            LOGGER.error("from remote server scp file : " + fileName + " error :", e);
+            return;
+        }
         // 复制到本地的日志文件
-        // File localFile = new File(localPath + fileName);
-        System.out.println("start to analyser---");
-
-        File localFile = new File(DEFAULT_LOG_FILE_NAME);
+        File localFile = new File(localPath + fileName);
+        LOGGER.info("start to analyser log : " + fileName);
         if (!localFile.exists()) {
             return;
         }
@@ -392,12 +402,11 @@ public class ScpTask {
             }
         }
 
-        System.out.println("---------");
-
         meiliyunDAO.insertPclick(buttonClicks);
         meiliyunDAO.insertPclick(iconClicks);
         meiliyunDAO.insertPclick(bannerClicks);
 
+        LOGGER.info("end to analyser log : " + fileName);
     }
 
     public String getCurrentDate() {
@@ -405,7 +414,7 @@ public class ScpTask {
         int YEAR = now.get(Calendar.YEAR);
         int MONTH = now.get(Calendar.MONTH);
         int DAY = now.get(Calendar.DAY_OF_MONTH);
-        String dateStr = YEAR + "-" + (MONTH + 1) + "-" + DAY;
+        String dateStr = YEAR + "-" + (MONTH + 1) + "-" + (DAY - 1);
 
         return dateStr;
     }
@@ -431,15 +440,6 @@ public class ScpTask {
     }
 
     public static void main(String[] args) throws ParseException, IOException, SQLException {
-
-        // scpFile();
-        /**
-         * 一月：January 二月：February 三月：March 四月：April 五月：May 六月：June 七月：July 八月：August 九月：September 十月：October
-         * 十一月：November 十二月：December
-         */
-        "".replaceAll("Jan", "01").replaceAll("Feb", "02").replaceAll("Mar", "03").replaceAll("Apr", "04")
-                .replaceAll("May", "05").replaceAll("Jun", "06").replaceAll("Jul", "07").replaceAll("Aug", "08")
-                .replaceAll("Sep", "09").replaceAll("Oct", "10").replaceAll("Nov", "11").replaceAll("Dec", "12");
 
         System.out.println("https://www.xianjinshijie.com:8443/show_list_page.do".split("8443/")[1]);
 
