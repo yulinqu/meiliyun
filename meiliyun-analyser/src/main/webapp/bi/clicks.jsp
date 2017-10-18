@@ -28,7 +28,7 @@
 		    </tr>  
 		    <c:forEach items="${clicks}" var="row" >  
 		        <tr style="border:1px black solid">  
-		            <td align="center">${row.time_range}</td>
+		            <td align="center">${row.timeRange}</td>
 		            <td align="center">${row.url}</td>  
 		            <td align="center">${row.advertisment}</td>  
 		            <td align="center">${row.AREA}</td>  

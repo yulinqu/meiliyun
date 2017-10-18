@@ -26,7 +26,7 @@
 		    </tr>  
 		    <c:forEach items="${pvuv}" var="row" >  
 		        <tr style="border:1px black solid">  
-		            <td align="center">${row.time_range}</td>
+		            <td align="center">${row.timeRange}</td>
 		            <td align="center">${row.url}</td>  
 		            <td align="center">${row.pv}</td>  
 		            <td align="center">${row.uv}</td>  
