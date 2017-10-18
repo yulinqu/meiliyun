@@ -40,22 +40,21 @@ public class ScpTask {
 
     public static final String DEFAULT_LOG_FILE_NAME_SUFFIX = ".log";
 
-    public static String TEST_DATA=null;
+    public static String TEST_DATA = null;
 
     private static Logger LOGGER = Logger.getLogger(ScpTask.class);
 
-    public void scpFileForTest(String data) throws IOException, SQLException{
-        TEST_DATA=data;
+    public void scpFileForTest(String data) throws IOException, SQLException {
+        TEST_DATA = data;
         scpFile();
-        TEST_DATA=null;
+        TEST_DATA = null;
     }
-
 
     public void scpFile() throws IOException, SQLException {
 
         // 远程服务器的文件名
         String fileName = DEFAULT_LOG_FILE_NAME + getCurrentDate() + DEFAULT_LOG_FILE_NAME_SUFFIX;
-        if(StringUtils.isNotBlank(TEST_DATA)){
+        if (StringUtils.isNotBlank(TEST_DATA)) {
             fileName = DEFAULT_LOG_FILE_NAME + TEST_DATA + DEFAULT_LOG_FILE_NAME_SUFFIX;
         }
 
@@ -65,14 +64,9 @@ public class ScpTask {
         String remoteFilePath = config.getRemoteFilePath() + fileName;
         String localPath = config.getLocalFilePath();
         // 1.从远程服务器 scp 文件到本地服务器
-        try {
-            ScpUtils.scpFileFromRemoteSever(remoteServerIp, remoteSeverHostname, remoteSeverPassword, remoteFilePath,
-                    localPath);
-            LOGGER.info("from remote server scp file : " + fileName + " success !");
-        } catch (Exception e) {
-            LOGGER.error("from remote server scp file : " + fileName + " error :", e);
-            return;
-        }
+        ScpUtils.scpFileFromRemoteSever(remoteServerIp, remoteSeverHostname, remoteSeverPassword, remoteFilePath,
+                localPath);
+        LOGGER.info("from remote server scp file : " + fileName + " success !");
         // 复制到本地的日志文件
         File localFile = new File(localPath + fileName);
         LOGGER.info("start to analyser log : " + fileName);
@@ -147,15 +141,14 @@ public class ScpTask {
 
                             int index = data.indexOf("msg=");
                             String pid_position = data.substring(index + 4, index + 38);
-                            String position="1";
-                            String pid="";
-                            if(pid_position.indexOf("-")!=-1){
+                            String position = "1";
+                            String pid = "";
+                            if (pid_position.indexOf("-") != -1) {
                                 position = pid_position.split("-")[0];
                                 pid = pid_position.split("-")[1];
-                            }else{
-                                pid=data.substring(index + 4, index + 36);
+                            } else {
+                                pid = data.substring(index + 4, index + 36);
                             }
-
 
                             if (data.contains("/img/behavior.gif?node=banner")) {
                                 // banner 统计
