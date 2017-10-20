@@ -52,7 +52,7 @@ public class ScpTask {
         } catch (Exception e) {
             LOGGER.error("scp file erroe !",e );
             TEST_DATA = null;
-            return "ERROR";
+            return "ERROR : "+e.getMessage();
         }
 
     }

@@ -83,12 +83,13 @@ public class AnalyserController {
 
     @RequestMapping(value = "scp_file", method = RequestMethod.GET)
     public @ResponseBody String test(@RequestParam("test_date") String testDate) {
+        String returnMsg=null;
         try {
-            scpTask.scpFileForTest(testDate);
-            return "success";
+            returnMsg=scpTask.scpFileForTest(testDate);
+            return returnMsg;
         } catch (Exception e) {
             e.printStackTrace();
-            return "error : " + e.getMessage();
+            return returnMsg;
         }
     }
 
