@@ -44,10 +44,17 @@ public class ScpTask {
 
     private static Logger LOGGER = Logger.getLogger(ScpTask.class);
 
-    public void scpFileForTest(String data) throws IOException, SQLException {
+    public String scpFileForTest(String data){
         TEST_DATA = data;
-        scpFile();
-        TEST_DATA = null;
+        try {
+            scpFile();
+            return "SUCCESS";
+        } catch (Exception e) {
+            LOGGER.error("scp file erroe !",e );
+            TEST_DATA = null;
+            return "ERROR";
+        }
+
     }
 
     public void scpFile() throws IOException, SQLException {
@@ -63,6 +70,14 @@ public class ScpTask {
         String remoteSeverPassword = config.getRemoteSeverPwd();
         String remoteFilePath = config.getRemoteFilePath() + fileName;
         String localPath = config.getLocalFilePath();
+
+
+        File file = new File(localPath + fileName);
+
+        if(file.exists()){
+            return;
+        }
+
         // 1.从远程服务器 scp 文件到本地服务器
         ScpUtils.scpFileFromRemoteSever(remoteServerIp, remoteSeverHostname, remoteSeverPassword, remoteFilePath,
                 localPath);
@@ -316,7 +331,10 @@ public class ScpTask {
         }
 
         // 插入每天的pvuv
-        meiliyunDAO.insertPvuv(pvuv);
+        if(CollectionUtils.isNotEmpty(pvuv)){
+            meiliyunDAO.insertPvuv(pvuv);
+        }
+
 
         // 统计每分钟不同主区域的点击情况
         List<ProductClickBean> bannerClicks = new ArrayList<ProductClickBean>();
@@ -414,9 +432,15 @@ public class ScpTask {
             }
         }
 
-        meiliyunDAO.insertPclick(buttonClicks);
-        meiliyunDAO.insertPclick(iconClicks);
-        meiliyunDAO.insertPclick(bannerClicks);
+        if(CollectionUtils.isNotEmpty(buttonClicks)){
+            meiliyunDAO.insertPclick(buttonClicks);
+        }
+        if(CollectionUtils.isNotEmpty(iconClicks)){
+            meiliyunDAO.insertPclick(iconClicks);
+        }
+        if(CollectionUtils.isNotEmpty(bannerClicks)){
+            meiliyunDAO.insertPclick(bannerClicks);
+        }
 
         LOGGER.info("end to analyser log : " + fileName);
     }
