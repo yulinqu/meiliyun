@@ -48,6 +48,7 @@ public class ScpTask {
         TEST_DATA = data;
         try {
             scpFile();
+            TEST_DATA=null;
             return "SUCCESS";
         } catch (Exception e) {
             LOGGER.error("scp file erroe !",e );
