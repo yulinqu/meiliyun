@@ -10,14 +10,16 @@ public class PvUv {
 
     private int uv;
 
+    private String uuid;
+
     public PvUv() {
     }
 
-    public PvUv(String timeRange, String url, int pv, int uv) {
+    public PvUv(String timeRange, String url,String uuid) {
         this.timeRange = timeRange;
         this.url = url;
-        this.pv = pv;
-        this.uv = uv;
+        this.uuid=uuid;
+
     }
 
     public String getUrl() {
@@ -50,6 +52,14 @@ public class PvUv {
 
     public void setUv(int uv) {
         this.uv = uv;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override

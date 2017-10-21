@@ -323,9 +323,9 @@ public class ScpTask {
                 Set<String> urlKey = urlMap.keySet();
                 for (String url : urlKey) {
                     List<String> datas = urlMap.get(url);
-                    Set<String> uniqDatas = new HashSet<String>();
-                    uniqDatas.addAll(datas);
-                    pvuv.add(new PvUv(key, url, datas.size(), uniqDatas.size()));
+                    for (String data : datas) {
+                        pvuv.add(new PvUv(key, url, data));
+                    }
                 }
 
             }

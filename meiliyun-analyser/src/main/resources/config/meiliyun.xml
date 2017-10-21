@@ -7,10 +7,10 @@
     
    	<!-- 插入pvuv -->
      <insert id="insert_pvuv" parameterClass="java.util.List">
-   		insert into pvuv(time_range,url,pv,uv) values
+   		insert into pvuv(time_range,url,uuid) values
 	     <iterate  conjunction =",">   
 		      <![CDATA[  
-	             (#pvuv[].timeRange#, #pvuv[].url#, #pvuv[].pv#,#pvuv[].uv#)
+	             (#pvuv[].timeRange#, #pvuv[].url#, #pvuv[].uuid#)
 	         ]]>   
 	      </iterate>  
 	</insert>
@@ -31,8 +31,8 @@
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
 	 		#url# url,
-	 		sum(pv) pv,
-	 		sum(uv) uv
+	 		count(*) pv,
+	 		count(distinct uuid) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
 	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') order by timeRange desc
 	 ]]>
@@ -43,8 +43,8 @@
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
 	 		#url# url,
-	 		sum(pv) pv,
-	 		sum(uv) uv
+	 		count(*) pv,
+	 		count(distinct uuid) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
 	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m-%d') order by timeRange desc
 	 ]]>
@@ -55,8 +55,8 @@
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m') timeRange,
 	 		#url# url,
-	 		sum(pv) pv,
-	 		sum(uv) uv
+	 		count(*) pv,
+	 		count(distinct uuid) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
 	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m') order by timeRange desc
 	 ]]>
@@ -67,8 +67,8 @@
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
 	 		#url# url,
-	 		sum(pv) pv,
-	 		sum(uv) uv
+	 		count(*) pv,
+	 		count(distinct uuid) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
 	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') order by timeRange desc
 	 ]]>
@@ -79,8 +79,8 @@
 	 	select 
 	 		time_range timeRange,
 	 		#url# url,
-	 		sum(pv) pv,
-	 		sum(uv)  uv
+	 		count(*) pv,
+	 		count(distinct uuid) uv
 	 	from pvuv where time_range>=#start_time# and time_range<#end_time# and url=#url# 
 	 	group by time_range
 	 	order by timeRange desc
