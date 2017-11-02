@@ -1,36 +1,26 @@
 package com.meiliyun.analyser.bean;
 
-public class PvUv {
+public class PvUv2 {
 
     private String timeRange;
 
     private String url;
 
-    private int pv;
-
-    private int uv;
-
     private String uuid;
 
     private String channel;
 
-    public PvUv() {
+    private String ip;
+
+    public PvUv2() {
     }
 
-    public PvUv(String timeRange, String url, String uuid, String channel) {
+    public PvUv2(String timeRange, String url, String uuid, String channel, String ip) {
         this.timeRange = timeRange;
         this.url = url;
         this.uuid = uuid;
         this.channel = channel;
-
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+        this.ip = ip;
     }
 
     public String getTimeRange() {
@@ -41,20 +31,12 @@ public class PvUv {
         this.timeRange = timeRange;
     }
 
-    public int getPv() {
-        return pv;
+    public String getUrl() {
+        return url;
     }
 
-    public void setPv(int pv) {
-        this.pv = pv;
-    }
-
-    public int getUv() {
-        return uv;
-    }
-
-    public void setUv(int uv) {
-        this.uv = uv;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getUuid() {
@@ -73,9 +55,18 @@ public class PvUv {
         this.channel = channel;
     }
 
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
     @Override
     public String toString() {
-        return "PvUv [timeRange=" + timeRange + ", url=" + url + ", pv=" + pv + ", uv=" + uv + "]";
+        return "PvUv2 [timeRange=" + timeRange + ", url=" + url + ", uuid=" + uuid + ", channel=" + channel + ", ip="
+                + ip + "]";
     }
 
 }

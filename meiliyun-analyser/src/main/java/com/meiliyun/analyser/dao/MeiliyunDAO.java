@@ -8,7 +8,9 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.meiliyun.analyser.bean.ProductClickBean;
+import com.meiliyun.analyser.bean.ProductClickBean2;
 import com.meiliyun.analyser.bean.PvUv;
+import com.meiliyun.analyser.bean.PvUv2;
 
 /**
  * meiliyun 相关数据操作
@@ -35,6 +37,10 @@ public class MeiliyunDAO extends MeiliyunBaseDAO {
         super.insert("insert_pvuv", pvuv);
     }
 
+    public void insertPvuv2(List<PvUv2> pvuv) throws SQLException {
+        super.insert("insert_pvuv", pvuv);
+    }
+
     /**
      * 插入点击数
      * 
@@ -45,12 +51,16 @@ public class MeiliyunDAO extends MeiliyunBaseDAO {
         super.insert("insert_pclick", pclick);
     }
 
+    public void insertPclick2(List<ProductClickBean2> pclick) throws SQLException {
+        super.insert("insert_pclick", pclick);
+    }
+
     public List<Map<String, Object>> getPvuvByTime(String url, String startTime, String endTime, String timeUnit)
             throws SQLException {
 
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("start_time", startTime);
-        params.put("end_time", endTime+" 23:59:59");
+        params.put("end_time", endTime + " 23:59:59");
         params.put("url", url);
         if (timeUnit.equalsIgnoreCase("hour"))
             return super.queryForList("get_hour_pvuv", params);
@@ -70,7 +80,7 @@ public class MeiliyunDAO extends MeiliyunBaseDAO {
             String advertisment) throws SQLException {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("start_time", startTime);
-        params.put("end_time", endTime+" 23:59:59");
+        params.put("end_time", endTime + " 23:59:59");
         params.put("url", url);
         params.put("ad", advertisment);
 

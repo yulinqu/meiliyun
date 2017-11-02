@@ -5,7 +5,7 @@
 
 <sqlMap namespace="meiliyun">
 
-	<!-- 插入pvuv2 -->
+	<!-- 插入pvuv -->
      <insert id="insert_pvuv" parameterClass="java.util.List">
    		insert into pvuv(time_range,url,uuid,channel,ip) values
 	     <iterate  conjunction =",">   
@@ -14,35 +14,12 @@
 	         ]]>   
 	      </iterate>  
 	</insert>
-	<!--    ---------------------------------------------  -->
 	
-   	<!-- 插入pvuv -->
-     <insert id="insert_pvuv" parameterClass="java.util.List">
-   		insert into pvuv(time_range,url,uuid) values
-	     <iterate  conjunction =",">   
-		      <![CDATA[  
-	             (#pvuv[].timeRange#, #pvuv[].url#, #pvuv[].uuid#)
-	         ]]>   
-	      </iterate>  
-	</insert>
-	
-	
-	<!--    ---------------------------------------------  -->
 	<insert id="insert_pclick" parameterClass="java.util.List">
    		insert into pclick(time_range,url,area,position,pid,channel,ip) values
 	     <iterate  conjunction =",">   
 		      <![CDATA[  
 	             (#pclick[].timeRange#, #pclick[].url#,#pclick[].area#,#pclick[].position#,#pclick[].pid#,#pclick[].channel#,,#pclick[].ip#)
-	         ]]>   
-	      </iterate>  
-	</insert>
-	
-	 <!-- 插入点击数 -->
-     <insert id="insert_pclick" parameterClass="java.util.List">
-   		insert into pclick(time_range,url,area,position,pid,count) values
-	     <iterate  conjunction =",">   
-		      <![CDATA[  
-	             (#pclick[].timeRange#, #pclick[].referUrl#,#pclick[].area#,#pclick[].position#,#pclick[].pid#,#pclick[].clickCount#)
 	         ]]>   
 	      </iterate>  
 	</insert>

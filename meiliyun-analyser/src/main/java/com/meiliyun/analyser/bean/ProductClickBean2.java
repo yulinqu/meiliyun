@@ -3,33 +3,35 @@ package com.meiliyun.analyser.bean;
 /**
  * 产品点击类
  */
-public class ProductClickBean {
+public class ProductClickBean2 {
 
     private String timeRange;
 
-    private String referUrl;
+    private String url;
 
     private String area;
 
     private String position;
 
+    // 产品id
     private String pid;
 
     private String channel;
 
-    private int clickCount;
+    private String ip;
 
-    public ProductClickBean() {
+    public ProductClickBean2() {
     }
 
-    public ProductClickBean(String timeRange, String referUrl, String area, String position, String pid,
-            int clickCount) {
+    public ProductClickBean2(String timeRange, String url, String area, String position, String pid, String channel,
+            String ip) {
         this.timeRange = timeRange;
-        this.referUrl = referUrl;
+        this.url = url;
         this.area = area;
         this.position = position;
         this.pid = pid;
-        this.clickCount = clickCount;
+        this.channel = channel;
+        this.ip = ip;
     }
 
     public String getTimeRange() {
@@ -40,12 +42,12 @@ public class ProductClickBean {
         this.timeRange = timeRange;
     }
 
-    public String getReferUrl() {
-        return referUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setReferUrl(String referUrl) {
-        this.referUrl = referUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getArea() {
@@ -64,14 +66,6 @@ public class ProductClickBean {
         this.position = position;
     }
 
-    public int getClickCount() {
-        return clickCount;
-    }
-
-    public void setClickCount(int clickCount) {
-        this.clickCount = clickCount;
-    }
-
     public String getPid() {
         return pid;
     }
@@ -80,10 +74,26 @@ public class ProductClickBean {
         this.pid = pid;
     }
 
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
     @Override
     public String toString() {
-        return "ProductClickBean [timeRange=" + timeRange + ", referUrl=" + referUrl + ", area=" + area + ", position="
-                + position + ", pid=" + pid + ", clickCount=" + clickCount + "]";
+        return "ProductClickBean2 [timeRange=" + timeRange + ", url=" + url + ", area=" + area + ", position="
+                + position + ", pid=" + pid + ", channel=" + channel + ", ip=" + ip + "]";
     }
 
 }

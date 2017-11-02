@@ -10,7 +10,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,16 +43,16 @@ public class ScpTask {
 
     private static Logger LOGGER = Logger.getLogger(ScpTask.class);
 
-    public String scpFileForTest(String data){
+    public String scpFileForTest(String data) {
         TEST_DATA = data;
         try {
             scpFile();
-            TEST_DATA=null;
+            TEST_DATA = null;
             return "SUCCESS";
         } catch (Exception e) {
-            LOGGER.error("scp file erroe !",e );
+            LOGGER.error("scp file erroe !", e);
             TEST_DATA = null;
-            return "ERROR : "+e.getMessage();
+            return "ERROR : " + e.getMessage();
         }
 
     }
@@ -72,10 +71,9 @@ public class ScpTask {
         String remoteFilePath = config.getRemoteFilePath() + fileName;
         String localPath = config.getLocalFilePath();
 
-
         File file = new File(localPath + fileName);
 
-        if(file.exists()){
+        if (file.exists()) {
             return;
         }
 
@@ -324,7 +322,7 @@ public class ScpTask {
                 for (String url : urlKey) {
                     List<String> datas = urlMap.get(url);
                     for (String data : datas) {
-                        pvuv.add(new PvUv(key, url, data));
+                        pvuv.add(new PvUv(key, url, data, null));
                     }
                 }
 
@@ -332,10 +330,9 @@ public class ScpTask {
         }
 
         // 插入每天的pvuv
-        if(CollectionUtils.isNotEmpty(pvuv)){
+        if (CollectionUtils.isNotEmpty(pvuv)) {
             meiliyunDAO.insertPvuv(pvuv);
         }
-
 
         // 统计每分钟不同主区域的点击情况
         List<ProductClickBean> bannerClicks = new ArrayList<ProductClickBean>();
@@ -433,13 +430,13 @@ public class ScpTask {
             }
         }
 
-        if(CollectionUtils.isNotEmpty(buttonClicks)){
+        if (CollectionUtils.isNotEmpty(buttonClicks)) {
             meiliyunDAO.insertPclick(buttonClicks);
         }
-        if(CollectionUtils.isNotEmpty(iconClicks)){
+        if (CollectionUtils.isNotEmpty(iconClicks)) {
             meiliyunDAO.insertPclick(iconClicks);
         }
-        if(CollectionUtils.isNotEmpty(bannerClicks)){
+        if (CollectionUtils.isNotEmpty(bannerClicks)) {
             meiliyunDAO.insertPclick(bannerClicks);
         }
 
