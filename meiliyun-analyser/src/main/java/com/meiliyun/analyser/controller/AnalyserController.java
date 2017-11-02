@@ -36,7 +36,8 @@ public class AnalyserController {
     @RequestMapping(value = "clicks", method = RequestMethod.GET)
     public ModelAndView analyser(@RequestParam(value = "ad", required = false) String ad,
             @RequestParam("staticTimeUnit") String staticTimeUnit, @RequestParam("startTime") String startTime,
-            @RequestParam("endTime") String endTime, @RequestParam("url") String url) {
+            @RequestParam("endTime") String endTime, @RequestParam("url") String url,
+            @RequestParam(value = "channel", required = false) String channel) {
 
         if (StringUtils.isBlank(ad)) {
             ad = "all";
@@ -60,7 +61,8 @@ public class AnalyserController {
 
     @RequestMapping(value = "pvuv", method = RequestMethod.GET)
     public ModelAndView getPvUv(@RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime,
-            @RequestParam("url") String url, @RequestParam("staticTimeUnit") String staticTimeUnit) {
+            @RequestParam("url") String url, @RequestParam("staticTimeUnit") String staticTimeUnit,
+            @RequestParam(value = "channel", required = false) String channel) {
 
         // 校验开始时间和结束时间
         ModelAndView modelAndView = new ModelAndView("pvuv");
@@ -83,9 +85,9 @@ public class AnalyserController {
 
     @RequestMapping(value = "scp_file", method = RequestMethod.GET)
     public @ResponseBody String test(@RequestParam("test_date") String testDate) {
-        String returnMsg=null;
+        String returnMsg = null;
         try {
-            returnMsg=scpTask.scpFileForTest(testDate);
+            returnMsg = scpTask.scpFileForTest(testDate);
             return returnMsg;
         } catch (Exception e) {
             e.printStackTrace();
