@@ -22,7 +22,6 @@ public class PvUv {
         this.url = url;
         this.uuid = uuid;
         this.channel = channel;
-
     }
 
     public String getUrl() {
