@@ -5,6 +5,15 @@
 
 <sqlMap namespace="meiliyun">
 
+
+	<delete id="delete_current_pvuv_minute_data"	parameterClass="java.util.Map">
+		delete from pvuv where time_range=#time_prefix#
+	</delete>
+
+	<delete id="delete_current_pclick_minute_data"	parameterClass="java.util.Map">
+		delete from pclick where time_range=#time_prefix#
+	</delete>
+
    	<!-- 插入pvuv -->
      <insert id="insert_pvuv" parameterClass="java.util.List">
    		insert into pvuv(time_range,url,uuid,channel) values

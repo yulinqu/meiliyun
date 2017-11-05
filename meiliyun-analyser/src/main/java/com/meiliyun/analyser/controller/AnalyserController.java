@@ -3,6 +3,7 @@ package com.meiliyun.analyser.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.meiliyun.analyser.bean.ScpTaskV2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class AnalyserController {
     @Autowired
     private ScpTask scpTask;
 
+    @Autowired
+    private ScpTaskV2 scpTask2;
+
     private static Logger LOGGER = Logger.getLogger(AnalyserController.class);
 
     @RequestMapping(value = "clicks", method = RequestMethod.GET)
@@ -46,8 +50,16 @@ public class AnalyserController {
         if(StringUtils.isBlank(channel)){
             channel="all";
         }
+
+        String currentDate = scpTask2.getCurrentDate();
+
         ModelAndView modelAndView = new ModelAndView("clicks");
         try {
+
+            if(endTime.compareToIgnoreCase(currentDate)>=0){
+                scpTask2.scpFile();
+            }
+
             List<Map<String, Object>> clickCountByTime = analyserService.getClickCountByTime(url, startTime, endTime,
                     staticTimeUnit, ad,channel);
 
@@ -71,9 +83,16 @@ public class AnalyserController {
             channel = "all";
         }
 
+        String currentDate = scpTask2.getCurrentDate();
+
         // 校验开始时间和结束时间
         ModelAndView modelAndView = new ModelAndView("pvuv");
         try {
+
+            if(endTime.compareToIgnoreCase(currentDate)>=0){
+                scpTask2.scpFile();
+            }
+
             List<Map<String, Object>> pvuvByUrlAndTime = analyserService.getPvuvByUrlAndTime(url, startTime, endTime,
                     staticTimeUnit,channel);
 

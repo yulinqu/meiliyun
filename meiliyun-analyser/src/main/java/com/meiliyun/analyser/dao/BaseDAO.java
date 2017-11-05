@@ -46,6 +46,10 @@ public abstract class BaseDAO {
         return (T) this.sqlMapClient.queryForObject(generate(statement), param);
     }
 
+    protected void delete(String statement, Object param) throws SQLException {
+        this.sqlMapClient.delete(generate(statement),param);
+    }
+
     protected Map queryForMap(String statement, Object param, String keyProperty) {
         try {
             return this.sqlMapClient.queryForMap(generate(statement), param, keyProperty);
@@ -65,6 +69,9 @@ public abstract class BaseDAO {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+
+
 
     protected abstract String nameSpace();
 }

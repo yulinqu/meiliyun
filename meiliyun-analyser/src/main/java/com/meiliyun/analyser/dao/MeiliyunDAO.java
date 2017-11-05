@@ -371,4 +371,29 @@ public class MeiliyunDAO extends MeiliyunBaseDAO {
         return null;
     }
 
+
+    /**
+     * 删除当前分钟的数据
+     * @param timePrefix
+     * @throws SQLException
+     */
+    public void deletePvuv(String timePrefix) throws SQLException {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("time_prefix",timePrefix);
+
+        super.delete("delete_current_pvuv_minute_data",params);
+
+    }
+
+    public void deletePclick(String timePrefix) throws SQLException {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("time_prefix",timePrefix);
+
+        super.delete("delete_current_pclick_minute_data",params);
+
+    }
+
+
+
+
 }
