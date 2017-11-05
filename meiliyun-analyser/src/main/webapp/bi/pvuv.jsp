@@ -21,14 +21,16 @@
 		    <tr style="border:1px black solid">  
 		        <th style="text-align: center">时间段</th>  
 		        <th style="text-align: center">URL</th>
+				<th style="text-align: center">CHANNEL</th>
 		        <th style="text-align: center">PV</th>  
 		        <th style="text-align: center">UV</th> 
 		    </tr>  
 		    <c:forEach items="${pvuv}" var="row" >  
 		        <tr style="border:1px black solid">  
 		            <td align="center">${row.timeRange}</td>
-		            <td align="center">${row.url}</td>  
-		            <td align="center">${row.pv}</td>  
+		            <td align="center">${row.url}</td>
+					<td align="center">${row.channel}</td>
+					<td align="center">${row.pv}</td>
 		            <td align="center">${row.uv}</td>  
 		        </tr>  
 		    </c:forEach>  

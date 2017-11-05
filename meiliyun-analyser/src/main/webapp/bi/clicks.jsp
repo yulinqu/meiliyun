@@ -21,6 +21,7 @@
 		    <tr style="border:1px black solid">  
 		        <th style="text-align: center">时间段</th>  
 		        <th style="text-align: center">URL</th>
+				<th style="text-align: center">CHANNEL</th>
 		        <th style="text-align: center">广告</th>  
 		        <th style="text-align: center">大区域</th> 
 		        <th style="text-align: center">位置</th>  
@@ -29,7 +30,8 @@
 		    <c:forEach items="${clicks}" var="row" >  
 		        <tr style="border:1px black solid">  
 		            <td align="center">${row.timeRange}</td>
-		            <td align="center">${row.url}</td>  
+		            <td align="center">${row.url}</td>
+					<td align="center">${row.channel}</td>
 		            <td align="center">${row.advertisment}</td>  
 		            <td align="center">${row.AREA}</td>  
 		            <td align="center">${row.POSITION}</td>  

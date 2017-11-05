@@ -450,7 +450,7 @@
     </select>
     
     <!-- 全部广告不分类  全部渠道分类 -->
-    <select id="get_hour_all_click_all_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+    <select id="get_hour_all_click_each_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
@@ -468,7 +468,7 @@
     </select>
     
     
-    <!----------DAY------------------------------------------------------------------------------ -->
+    <!-- DAY -->
     <!-- 指定广告 指定渠道 -->
     <select id="get_day_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[
@@ -594,7 +594,7 @@
 	</select>
 	
 	<!-- 全部广告分类 全部渠道不分类 -->
-	<select id="get_day_each_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	<select id="get_day_each_click_all_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 		<![CDATA[
 		select a.* from (
 	 	select
@@ -675,7 +675,7 @@
     
     
     <!-- 全部广告不分类  全部渠道不分类 -->
-    <select id="get_day_all_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+    <select id="get_day_all_click_all_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
@@ -693,7 +693,7 @@
     </select>
     
     <!-- 全部广告不分类  全部渠道分类 -->
-    <select id="get_day_all_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+    <select id="get_day_all_click_each_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
@@ -711,7 +711,7 @@
     </select>
     
     
-    <!--  --------MONTH------------------------------------------------------------------------------ -->
+    <!--  MONTH -->
     <!-- 指定广告 指定渠道 -->
     <select id="get_month_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[
@@ -954,7 +954,7 @@
     </select>
     
     
-    <!--  --------WEEK------------------------------------------------------------------------------ -->
+    <!-- WEEK -->
     <!-- 指定广告 指定渠道 -->
     <select id="get_week_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[
@@ -987,7 +987,7 @@
     </select>
     
      <!-- 指定广告 全部渠道不分类 -->
-    <select id="get_week_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+    <select id="get_week_click_all_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[
 	  select a.* from (
 	 	select 
@@ -1018,7 +1018,7 @@
     </select>
     
 	<!-- 指定广告 全部渠道分类 -->
-    <select id="get_week_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+    <select id="get_week_click_each_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[
 	  select a.* from (
 	 	select 
@@ -1113,7 +1113,7 @@
 	
 	
 	<!-- 全部广告分类 全部渠道分类 -->
-	<select id="get_week_each_click_all_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	<select id="get_week_each_click_each_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 		<![CDATA[
 		select a.* from (
 	 	select
@@ -1182,7 +1182,7 @@
     
     
     <!-- 全部广告不分类  全部渠道分类 -->
-    <select id="get_week_all_click_all_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+    <select id="get_week_all_click_each_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[ 
 	 	select 
 	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
@@ -1200,7 +1200,7 @@
     </select>
     
     
-    <!--  --------MINUTE------------------------------------------------------------------------------ -->
+    <!--  MINUTE -->
     <!-- 指定广告 指定渠道 -->
      <select id="get_minute_click_channel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
 	  <![CDATA[

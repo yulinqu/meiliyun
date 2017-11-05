@@ -21,16 +21,16 @@ public class AnalyserService {
 
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-    public List<Map<String, Object>> getPvuvByUrlAndTime(String url, String startTime, String endTime, String timeUnit)
+    public List<Map<String, Object>> getPvuvByUrlAndTime(String url, String startTime, String endTime, String timeUnit,String channel)
             throws SQLException {
-        List<Map<String, Object>> pvuvByTime = meiliyunDAO.getPvuvByTime(url, startTime, endTime, timeUnit);
+        List<Map<String, Object>> pvuvByTime = meiliyunDAO.getPvuvByTime(url, startTime, endTime, timeUnit,channel);
         return pvuvByTime;
     }
 
     public List<Map<String, Object>> getClickCountByTime(String url, String startTime, String endTime, String timeUnit,
-            String advertisment) throws SQLException {
+            String advertisment,String channel) throws SQLException {
         List<Map<String, Object>> clickCount = meiliyunDAO.getClickCount(url, startTime, endTime, timeUnit,
-                advertisment);
+                advertisment,channel);
 
         if (timeUnit.equalsIgnoreCase("week")) {
             for (Map<String, Object> map : clickCount) {

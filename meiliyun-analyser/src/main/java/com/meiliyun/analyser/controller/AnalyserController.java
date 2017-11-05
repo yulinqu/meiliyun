@@ -42,10 +42,14 @@ public class AnalyserController {
         if (StringUtils.isBlank(ad)) {
             ad = "all";
         }
+
+        if(StringUtils.isBlank(channel)){
+            channel="all";
+        }
         ModelAndView modelAndView = new ModelAndView("clicks");
         try {
             List<Map<String, Object>> clickCountByTime = analyserService.getClickCountByTime(url, startTime, endTime,
-                    staticTimeUnit, ad);
+                    staticTimeUnit, ad,channel);
 
             modelAndView.addObject("clicks", clickCountByTime);
             modelAndView.addObject("status", "成功");
@@ -63,12 +67,15 @@ public class AnalyserController {
     public ModelAndView getPvUv(@RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime,
             @RequestParam("url") String url, @RequestParam("staticTimeUnit") String staticTimeUnit,
             @RequestParam(value = "channel", required = false) String channel) {
+        if(StringUtils.isBlank(channel)){
+            channel = "all";
+        }
 
         // 校验开始时间和结束时间
         ModelAndView modelAndView = new ModelAndView("pvuv");
         try {
             List<Map<String, Object>> pvuvByUrlAndTime = analyserService.getPvuvByUrlAndTime(url, startTime, endTime,
-                    staticTimeUnit);
+                    staticTimeUnit,channel);
 
             modelAndView.addObject("pvuv", pvuvByUrlAndTime);
             modelAndView.addObject("status", "成功");
