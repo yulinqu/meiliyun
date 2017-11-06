@@ -13,6 +13,11 @@
 	<delete id="delete_current_pclick_minute_data"	parameterClass="java.util.Map">
 		delete from pclick where time_range=#time_prefix#
 	</delete>
+	
+	 <select id="GET_MAX_TIME_RANGE" parameterClass="java.util.Map" resultClass="java.lang.String">
+	 	select max(time_range) as maxTimeRange from pvuv
+	 </select>
+	
 
    	<!-- 插入pvuv -->
      <insert id="insert_pvuv" parameterClass="java.util.List">
