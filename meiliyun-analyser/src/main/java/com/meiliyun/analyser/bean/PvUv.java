@@ -12,14 +12,16 @@ public class PvUv {
 
     private String uuid;
 
+    private String channel;
+
     public PvUv() {
     }
 
-    public PvUv(String timeRange, String url,String uuid) {
+    public PvUv(String timeRange, String url, String uuid, String channel) {
         this.timeRange = timeRange;
         this.url = url;
-        this.uuid=uuid;
-
+        this.uuid = uuid;
+        this.channel = channel;
     }
 
     public String getUrl() {
@@ -60,6 +62,14 @@ public class PvUv {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     @Override

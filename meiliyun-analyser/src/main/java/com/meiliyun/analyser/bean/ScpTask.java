@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +26,7 @@ import com.meiliyun.analyser.utils.ScpUtils;
 
 /**
  * 每天定时去nginx服务器scp文件到本地
- * 
+ *
  * @author yulinqu
  */
 public class ScpTask {
@@ -36,6 +37,9 @@ public class ScpTask {
     @Autowired
     private MeiliyunDAO meiliyunDAO;
 
+    @Autowired
+    private ScpTaskV2 scpTaskV2;
+
     public static final String DEFAULT_LOG_FILE_NAME = "access-";
 
     public static final String DEFAULT_LOG_FILE_NAME_SUFFIX = ".log";
@@ -44,16 +48,16 @@ public class ScpTask {
 
     private static Logger LOGGER = Logger.getLogger(ScpTask.class);
 
-    public String scpFileForTest(String data){
+    public String scpFileForTest(String data) {
         TEST_DATA = data;
         try {
             scpFile();
-            TEST_DATA=null;
+            TEST_DATA = null;
             return "SUCCESS";
         } catch (Exception e) {
-            LOGGER.error("scp file erroe !",e );
+            LOGGER.error("scp file erroe !", e);
             TEST_DATA = null;
-            return "ERROR : "+e.getMessage();
+            return "ERROR : " + e.getMessage();
         }
 
     }
@@ -61,7 +65,7 @@ public class ScpTask {
     public void scpFile() throws IOException, SQLException {
 
         // 远程服务器的文件名
-        String fileName = DEFAULT_LOG_FILE_NAME + getCurrentDate() + DEFAULT_LOG_FILE_NAME_SUFFIX;
+        String fileName = DEFAULT_LOG_FILE_NAME + getOneDayBefore() + DEFAULT_LOG_FILE_NAME_SUFFIX;
         if (StringUtils.isNotBlank(TEST_DATA)) {
             fileName = DEFAULT_LOG_FILE_NAME + TEST_DATA + DEFAULT_LOG_FILE_NAME_SUFFIX;
         }
@@ -72,10 +76,9 @@ public class ScpTask {
         String remoteFilePath = config.getRemoteFilePath() + fileName;
         String localPath = config.getLocalFilePath();
 
-
         File file = new File(localPath + fileName);
 
-        if(file.exists()){
+        if (file.exists()) {
             return;
         }
 
@@ -85,19 +88,27 @@ public class ScpTask {
         LOGGER.info("from remote server scp file : " + fileName + " success !");
         // 复制到本地的日志文件
         File localFile = new File(localPath + fileName);
+        // File localFile = new
+        // File("/Users/yulinqu/workspace/meiliyun/meiliyun-analyser/src/main/resources/db/access.txt");
         LOGGER.info("start to analyser log : " + fileName);
+
         if (!localFile.exists()) {
             return;
         }
 
+        String initTime = meiliyunDAO.getMaxTimeRange();
+        meiliyunDAO.deletePvuv(initTime);
+        meiliyunDAO.deletePclick(initTime);
+
         // 每分钟的pv uv<time,<url,List<uuid>>>
-        Map<String, Map<String, List<String>>> preMinCount = new HashMap<String, Map<String, List<String>>>();
+        // Map<String, Map<String, List<PvUv>>> preMinCount = new HashMap<String, Map<String, List<PvUv>>>();
+        List<PvUv> pvuvs = new ArrayList<PvUv>();
 
         // 各产品每分钟的点击情况<time,<url,<position,Map<pid,count>>>>
 
-        Map<String, Map<String, Map<String, Map<String, List<String>>>>> preBannerClick = new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>();
-        Map<String, Map<String, Map<String, Map<String, List<String>>>>> preIconClick = new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>();
-        Map<String, Map<String, Map<String, Map<String, List<String>>>>> preButtonClick = new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>();
+        Map<String, Map<String, Map<String, Map<String, Map<String, List<String>>>>>> preBannerClick = new HashMap<String, Map<String, Map<String, Map<String, Map<String, List<String>>>>>>();
+        Map<String, Map<String, Map<String, Map<String, Map<String, List<String>>>>>> preIconClick = new HashMap<String, Map<String, Map<String, Map<String, Map<String, List<String>>>>>>();
+        Map<String, Map<String, Map<String, Map<String, Map<String, List<String>>>>>> preButtonClick = new HashMap<String, Map<String, Map<String, Map<String, Map<String, List<String>>>>>>();
 
         // 2.分析文件 按照每分钟的来统计 解析日志文件
         if (localFile.isFile() && localFile.exists()) { // 判断文件是否存在
@@ -105,237 +116,331 @@ public class ScpTask {
             BufferedReader bufferedReader = new BufferedReader(read);
             String lineTxt = null;
             while ((lineTxt = bufferedReader.readLine()) != null) {
-                String[] split = lineTxt.split("\\|");
-                // 请求ip
-                String ip = split[0];
-                // 请求时间
-                String requestTime = split[1];
-                String reTime = null;
-                if (StringUtils.isNotBlank(requestTime)) {
-                    // 14/Oct/2017:06:06:48
-                    reTime = formateDate(requestTime);
-                }
-                // 埋点数据
-                String data = split[2];
-                if (StringUtils.isNotBlank(data) && data.contains("/img/behavior.gif?")) {
-                    // uuid
-                    String uuidOri = split[9].replace(" ", "");
-                    String uuid = "UUID";
-                    if (StringUtils.isNotBlank(uuidOri)) {
-                        uuid = uuidOri;
-                    }
-                    ;
-
-                    // Referer 当前页url http://www.xianjinshijie.com:8090/show_list_page.do
-                    String referer = split[8].replaceAll(" ", "");
-                    String url = "show_list_page.do";
-                    if (referer.indexOf("8443/") != -1) {
-                        url = referer.split("8443/")[1];
+                try {
+                    String[] split = lineTxt.split("\\|");
+                    // 请求ip
+                    String ip = split[0];
+                    // 请求时间
+                    String requestTime = split[1];
+                    String reTime = null;
+                    if (StringUtils.isNotBlank(requestTime)) {
+                        // 14/Oct/2017:06:06:48
+                        reTime = formateDate(requestTime);
                     }
 
-                    // 访问list_page
-                    if (data.contains("/img/behavior.gif?rnd=")) {
-                        // pvuv
-                        if (preMinCount.get(reTime) == null) {
-                            preMinCount.put(reTime, new HashMap<String, List<String>>());
+                    if (reTime.compareToIgnoreCase(initTime) == -1) {
+                        continue;
+                    }
+
+                    // 埋点数据
+                    String data = split[2];
+                    if (StringUtils.isNotBlank(data) && data.contains("/img/behavior.gif?")) {
+                        // uuid
+                        String uuidOri = split[9].replace(" ", "");
+                        String uuid = "UUID";
+                        if (StringUtils.isNotBlank(uuidOri)) {
+                            uuid = uuidOri;
                         }
+                        ;
 
-                        if (StringUtils.isNotBlank(url)) {
-                            if (preMinCount.get(reTime).get(url) != null) {
-                                preMinCount.get(reTime).get(url).add(uuid);
-                            } else {
-                                preMinCount.get(reTime).put(url, new ArrayList<String>());
-                                preMinCount.get(reTime).get(url).add(uuid);
-                            }
-
-                        }
-
-                    }
-                    // banner点击
-                    else {
-                        if (data.contains("/img/behavior.gif?node=")) {
-
-                            int index = data.indexOf("msg=");
-                            String pid_position = data.substring(index + 4, index + 38);
-                            String position = "1";
-                            String pid = "";
-                            if (pid_position.indexOf("-") != -1) {
-                                position = pid_position.split("-")[0];
-                                pid = pid_position.split("-")[1];
-                            } else {
-                                pid = data.substring(index + 4, index + 36);
-                            }
-
-                            if (data.contains("/img/behavior.gif?node=banner")) {
-                                // banner 统计
-                                if (preBannerClick.get(reTime) == null) {
-                                    preBannerClick.put(reTime,
-                                            new HashMap<String, Map<String, Map<String, List<String>>>>());
-                                }
-
-                                if (data.contains("/img/behavior.gif?node=banner-new")) {
-                                    url = url + "_new";
-                                }
-                                // 各产品每分钟的点击情况<time,<url,<position,Map<pid,count>>>>
-                                if (StringUtils.isNotBlank(url)) {
-                                    if (preBannerClick.get(reTime).get(url) != null) {
-
-                                        if (preBannerClick.get(reTime).get(url).get(position) != null) {
-
-                                            if (preBannerClick.get(reTime).get(url).get(position).get(pid) != null) {
-                                                preBannerClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                            } else {
-                                                preBannerClick.get(reTime).get(url).get(position).put(pid,
-                                                        new ArrayList<String>());
-                                                preBannerClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                            }
-
-                                        } else {
-
-                                            preBannerClick.get(reTime).get(url).put(position,
-                                                    new HashMap<String, List<String>>());
-                                            preBannerClick.get(reTime).get(url).get(position).put(pid,
-                                                    new ArrayList<String>());
-                                            preBannerClick.get(reTime).get(url).get(position).get(pid).add(pid);
+                        // Referer 当前页url https://www.xianjinshijie.com:8344/show_list_page.do?channel=dx
+                        String referer = split[8].replaceAll(" ", "").replace("://", "").replace(":8443", "");
+                        // 请求url
+                        String url = "show_list_page.do";
+                        String[] refererSplit = referer.split("/");
+                        String onlineUrl = refererSplit[1];
+                        // 渠道
+                        String channel = "other";
+                        if (onlineUrl.contains("?")) {
+                            String[] onlineUrlsplit = onlineUrl.split("\\?");
+                            if (StringUtils.isNotBlank(onlineUrlsplit[0])) {
+                                url = onlineUrlsplit[0];
+                                if (StringUtils.isNotBlank(onlineUrlsplit[1])) {
+                                    String[] parameters = onlineUrlsplit[1].split("&");
+                                    for (String parameter : parameters) {
+                                        String[] parameterSplite = parameter.split("=");
+                                        if ("channel".equals(parameterSplite[0])) {
+                                            channel = parameterSplite[1];
                                         }
-
-                                    } else {
-                                        preBannerClick.get(reTime).put(url,
-                                                new HashMap<String, Map<String, List<String>>>());
-                                        preBannerClick.get(reTime).get(url).put(position,
-                                                new HashMap<String, List<String>>());
-                                        preBannerClick.get(reTime).get(url).get(position).put(pid,
-                                                new ArrayList<String>());
-                                        preBannerClick.get(reTime).get(url).get(position).get(pid).add(pid);
                                     }
-
-                                }
-
-                            }
-                            // icon点击
-                            else if (data.contains("/img/behavior.gif?node=merchant-list-icon")) {
-
-                                if (preIconClick.get(reTime) == null) {
-                                    preIconClick.put(reTime,
-                                            new HashMap<String, Map<String, Map<String, List<String>>>>());
-                                }
-
-                                if (data.contains("/img/behavior.gif?node=merchant-list-icon-new")) {
-                                    url = url + "_new";
-                                }
-
-                                if (StringUtils.isNotBlank(url)) {
-                                    if (preIconClick.get(reTime).get(url) != null) {
-
-                                        if (preIconClick.get(reTime).get(url).get(position) != null) {
-
-                                            if (preIconClick.get(reTime).get(url).get(position).get(pid) != null) {
-                                                preIconClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                            } else {
-                                                preIconClick.get(reTime).get(url).get(position).put(pid,
-                                                        new ArrayList<String>());
-                                                preIconClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                            }
-
-                                        } else {
-
-                                            preIconClick.get(reTime).get(url).put(position,
-                                                    new HashMap<String, List<String>>());
-                                            preIconClick.get(reTime).get(url).get(position).put(pid,
-                                                    new ArrayList<String>());
-                                            preIconClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                        }
-
-                                    } else {
-                                        preIconClick.get(reTime).put(url,
-                                                new HashMap<String, Map<String, List<String>>>());
-                                        preIconClick.get(reTime).get(url).put(position,
-                                                new HashMap<String, List<String>>());
-                                        preIconClick.get(reTime).get(url).get(position).put(pid,
-                                                new ArrayList<String>());
-                                        preIconClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                    }
-
-                                }
-
-                            }
-                            // button点击
-                            else if (data.contains("/img/behavior.gif?node=merchant-list-button")) {
-
-                                if (preButtonClick.get(reTime) == null) {
-                                    preButtonClick.put(reTime,
-                                            new HashMap<String, Map<String, Map<String, List<String>>>>());
-                                }
-
-                                if (data.contains("/img/behavior.gif?node=merchant-list-button-new")) {
-                                    url = url + "_new";
-                                }
-
-                                if (StringUtils.isNotBlank(url)) {
-                                    if (preButtonClick.get(reTime).get(url) != null) {
-
-                                        if (preButtonClick.get(reTime).get(url).get(position) != null) {
-
-                                            if (preButtonClick.get(reTime).get(url).get(position).get(pid) != null) {
-                                                preButtonClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                            } else {
-                                                preButtonClick.get(reTime).get(url).get(position).put(pid,
-                                                        new ArrayList<String>());
-                                                preButtonClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                            }
-
-                                        } else {
-
-                                            preButtonClick.get(reTime).get(url).put(position,
-                                                    new HashMap<String, List<String>>());
-                                            preButtonClick.get(reTime).get(url).get(position).put(pid,
-                                                    new ArrayList<String>());
-                                            preButtonClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                        }
-
-                                    } else {
-                                        preButtonClick.get(reTime).put(url,
-                                                new HashMap<String, Map<String, List<String>>>());
-                                        preButtonClick.get(reTime).get(url).put(position,
-                                                new HashMap<String, List<String>>());
-                                        preButtonClick.get(reTime).get(url).get(position).put(pid,
-                                                new ArrayList<String>());
-                                        preButtonClick.get(reTime).get(url).get(position).get(pid).add(pid);
-                                    }
-
                                 }
 
                             }
                         }
-                    }
 
+                        // 访问list_page
+                        if (data.contains("/img/behavior.gif?rnd=")) {
+                            // pvuv
+                            pvuvs.add(new PvUv(reTime, url, uuid, channel));
+                        }
+                        // banner点击
+                        else {
+                            if (data.contains("/img/behavior.gif?node=")) {
+
+                                int index = data.indexOf("msg=");
+                                String pid_position = data.substring(index + 4, index + 38);
+                                String position = "1";
+                                String pid = "";
+                                if (pid_position.indexOf("-") != -1) {
+                                    position = pid_position.split("-")[0];
+                                    pid = pid_position.split("-")[1];
+                                } else {
+                                    pid = data.substring(index + 4, index + 36);
+                                }
+
+                                if (data.contains("/img/behavior.gif?node=banner")) {
+                                    // banner 统计
+                                    if (preBannerClick.get(reTime) == null) {
+                                        preBannerClick.put(reTime,
+                                                new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>());
+                                    }
+
+                                    if (data.contains("/img/behavior.gif?node=banner-new")) {
+                                        url = url + "_new";
+                                    }
+                                    // 各产品每分钟的点击情况<time,<url,<channel,<position,Map<pid,count>>>>>
+                                    if (StringUtils.isNotBlank(url)) {
+
+                                        if (preBannerClick.get(reTime).get(url) != null) {
+
+                                            if (preBannerClick.get(reTime).get(url).get(channel) != null) {
+
+                                                if (preBannerClick.get(reTime).get(url).get(channel)
+                                                        .get(position) != null) {
+
+                                                    if (preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid) != null) {
+                                                        preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
+                                                    } else {
+                                                        preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                                .put(pid, new ArrayList<String>());
+                                                        preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
+                                                    }
+
+                                                } else {
+
+                                                    preBannerClick.get(reTime).get(url).get(channel).put(position,
+                                                            new HashMap<String, List<String>>());
+
+                                                    preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                            .put(pid, new ArrayList<String>());
+
+                                                    preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid).add(pid);
+                                                }
+
+                                            } else {
+
+                                                preBannerClick.get(reTime).get(url).put(channel,
+                                                        new HashMap<String, Map<String, List<String>>>());
+
+                                                preBannerClick.get(reTime).get(url).get(channel).put(position,
+                                                        new HashMap<String, List<String>>());
+
+                                                preBannerClick.get(reTime).get(url).get(channel).get(position).put(pid,
+                                                        new ArrayList<String>());
+
+                                                preBannerClick.get(reTime).get(url).get(channel).get(position).get(pid)
+                                                        .add(pid);
+
+                                            }
+
+                                        } else {
+                                            preBannerClick.get(reTime).put(url,
+                                                    new HashMap<String, Map<String, Map<String, List<String>>>>());
+
+                                            preBannerClick.get(reTime).get(url).put(channel,
+                                                    new HashMap<String, Map<String, List<String>>>());
+
+                                            preBannerClick.get(reTime).get(url).get(channel).put(position,
+                                                    new HashMap<String, List<String>>());
+
+                                            preBannerClick.get(reTime).get(url).get(channel).get(position).put(pid,
+                                                    new ArrayList<String>());
+
+                                            preBannerClick.get(reTime).get(url).get(channel).get(position).get(pid)
+                                                    .add(pid);
+                                        }
+
+                                    }
+
+                                }
+                                // icon点击
+                                else if (data.contains("/img/behavior.gif?node=merchant-list-icon")) {
+
+                                    if (preIconClick.get(reTime) == null) {
+                                        preIconClick.put(reTime,
+                                                new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>());
+                                    }
+
+                                    if (data.contains("/img/behavior.gif?node=merchant-list-icon-new")) {
+                                        url = url + "_new";
+                                    }
+
+                                    if (StringUtils.isNotBlank(url)) {
+
+                                        if (preIconClick.get(reTime).get(url) != null) {
+
+                                            if (preIconClick.get(reTime).get(url).get(channel) != null) {
+
+                                                if (preIconClick.get(reTime).get(url).get(channel)
+                                                        .get(position) != null) {
+
+                                                    if (preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid) != null) {
+                                                        preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
+                                                    } else {
+                                                        preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                                .put(pid, new ArrayList<String>());
+                                                        preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
+                                                    }
+
+                                                } else {
+
+                                                    preIconClick.get(reTime).get(url).get(channel).put(position,
+                                                            new HashMap<String, List<String>>());
+
+                                                    preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                            .put(pid, new ArrayList<String>());
+
+                                                    preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid).add(pid);
+                                                }
+
+                                            } else {
+
+                                                preIconClick.get(reTime).get(url).put(channel,
+                                                        new HashMap<String, Map<String, List<String>>>());
+
+                                                preIconClick.get(reTime).get(url).get(channel).put(position,
+                                                        new HashMap<String, List<String>>());
+
+                                                preIconClick.get(reTime).get(url).get(channel).get(position).put(pid,
+                                                        new ArrayList<String>());
+
+                                                preIconClick.get(reTime).get(url).get(channel).get(position).get(pid)
+                                                        .add(pid);
+
+                                            }
+
+                                        } else {
+                                            preIconClick.get(reTime).put(url,
+                                                    new HashMap<String, Map<String, Map<String, List<String>>>>());
+
+                                            preIconClick.get(reTime).get(url).put(channel,
+                                                    new HashMap<String, Map<String, List<String>>>());
+
+                                            preIconClick.get(reTime).get(url).get(channel).put(position,
+                                                    new HashMap<String, List<String>>());
+
+                                            preIconClick.get(reTime).get(url).get(channel).get(position).put(pid,
+                                                    new ArrayList<String>());
+
+                                            preIconClick.get(reTime).get(url).get(channel).get(position).get(pid)
+                                                    .add(pid);
+                                        }
+
+                                    }
+
+                                }
+                                // button点击
+                                else if (data.contains("/img/behavior.gif?node=merchant-list-button")) {
+                                    if (preButtonClick.get(reTime) == null) {
+                                        preButtonClick.put(reTime,
+                                                new HashMap<String, Map<String, Map<String, Map<String, List<String>>>>>());
+                                    }
+
+                                    if (data.contains("/img/behavior.gif?node=merchant-list-button-new")) {
+                                        url = url + "_new";
+                                    }
+
+                                    if (StringUtils.isNotBlank(url)) {
+
+                                        if (preButtonClick.get(reTime).get(url) != null) {
+
+                                            if (preButtonClick.get(reTime).get(url).get(channel) != null) {
+
+                                                if (preButtonClick.get(reTime).get(url).get(channel)
+                                                        .get(position) != null) {
+
+                                                    if (preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid) != null) {
+                                                        preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
+                                                    } else {
+                                                        preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                                .put(pid, new ArrayList<String>());
+                                                        preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
+                                                    }
+
+                                                } else {
+
+                                                    preButtonClick.get(reTime).get(url).get(channel).put(position,
+                                                            new HashMap<String, List<String>>());
+
+                                                    preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                            .put(pid, new ArrayList<String>());
+
+                                                    preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid).add(pid);
+                                                }
+
+                                            } else {
+
+                                                preButtonClick.get(reTime).get(url).put(channel,
+                                                        new HashMap<String, Map<String, List<String>>>());
+
+                                                preButtonClick.get(reTime).get(url).get(channel).put(position,
+                                                        new HashMap<String, List<String>>());
+
+                                                preButtonClick.get(reTime).get(url).get(channel).get(position).put(pid,
+                                                        new ArrayList<String>());
+
+                                                preButtonClick.get(reTime).get(url).get(channel).get(position).get(pid)
+                                                        .add(pid);
+
+                                            }
+
+                                        } else {
+                                            preButtonClick.get(reTime).put(url,
+                                                    new HashMap<String, Map<String, Map<String, List<String>>>>());
+
+                                            preButtonClick.get(reTime).get(url).put(channel,
+                                                    new HashMap<String, Map<String, List<String>>>());
+
+                                            preButtonClick.get(reTime).get(url).get(channel).put(position,
+                                                    new HashMap<String, List<String>>());
+
+                                            preButtonClick.get(reTime).get(url).get(channel).get(position).put(pid,
+                                                    new ArrayList<String>());
+
+                                            preButtonClick.get(reTime).get(url).get(channel).get(position).get(pid)
+                                                    .add(pid);
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+
             read.close();
         }
 
-        // 统计每分钟pv uv
-        List<PvUv> pvuv = new ArrayList<PvUv>();
-        if (!preMinCount.isEmpty()) {
-            Set<String> keys = preMinCount.keySet();
-            for (String key : keys) {
-                Map<String, List<String>> urlMap = preMinCount.get(key);
-                Set<String> urlKey = urlMap.keySet();
-                for (String url : urlKey) {
-                    List<String> datas = urlMap.get(url);
-                    for (String data : datas) {
-                        pvuv.add(new PvUv(key, url, data));
-                    }
-                }
-
-            }
-        }
-
         // 插入每天的pvuv
-        if(CollectionUtils.isNotEmpty(pvuv)){
-            meiliyunDAO.insertPvuv(pvuv);
+        if (CollectionUtils.isNotEmpty(pvuvs)) {
+            meiliyunDAO.insertPvuv(pvuvs);
         }
-
 
         // 统计每分钟不同主区域的点击情况
         List<ProductClickBean> bannerClicks = new ArrayList<ProductClickBean>();
@@ -345,28 +450,38 @@ public class ScpTask {
         if (!preBannerClick.isEmpty()) {
             Set<String> times = preBannerClick.keySet();
             for (String time : times) {
-                Map<String, Map<String, Map<String, List<String>>>> timeMap = preBannerClick.get(time);
+
+                Map<String, Map<String, Map<String, Map<String, List<String>>>>> timeMap = preBannerClick.get(time);
                 if (!timeMap.isEmpty()) {
                     Set<String> urls = timeMap.keySet();
                     for (String url : urls) {
-                        Map<String, Map<String, List<String>>> positionMap = timeMap.get(url);
-                        if (!positionMap.isEmpty()) {
-                            Set<String> positions = positionMap.keySet();
-                            for (String position : positions) {
-                                Map<String, List<String>> pidMap = positionMap.get(position);
-                                if (!pidMap.isEmpty()) {
-                                    Set<String> pids = pidMap.keySet();
-                                    for (String pid : pids) {
-                                        List<String> list = pidMap.get(pid);
-                                        if (CollectionUtils.isNotEmpty(list)) {
-                                            ProductClickBean productClickBean = new ProductClickBean(time, url,
-                                                    "banner", position, pid, list.size());
-                                            bannerClicks.add(productClickBean);
+                        Map<String, Map<String, Map<String, List<String>>>> channelMap = timeMap.get(url);
+                        if (!channelMap.isEmpty()) {
+                            Set<String> channelKeys = channelMap.keySet();
+                            for (String channel : channelKeys) {
+                                Map<String, Map<String, List<String>>> positionMap = channelMap.get(channel);
+                                if (!positionMap.isEmpty()) {
+                                    Set<String> positions = positionMap.keySet();
+                                    for (String position : positions) {
+                                        Map<String, List<String>> pidMap = positionMap.get(position);
+                                        if (!pidMap.isEmpty()) {
+                                            Set<String> pids = pidMap.keySet();
+                                            for (String pid : pids) {
+                                                List<String> list = pidMap.get(pid);
+                                                if (CollectionUtils.isNotEmpty(list)) {
+                                                    ProductClickBean productClickBean = new ProductClickBean(time, url,
+                                                            "banner", position, pid, channel, list.size());
+                                                    bannerClicks.add(productClickBean);
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
                             }
+
                         }
+
                     }
                 }
             }
@@ -375,85 +490,106 @@ public class ScpTask {
         if (!preIconClick.isEmpty()) {
             Set<String> times = preIconClick.keySet();
             for (String time : times) {
-                Map<String, Map<String, Map<String, List<String>>>> timeMap = preIconClick.get(time);
+
+                Map<String, Map<String, Map<String, Map<String, List<String>>>>> timeMap = preIconClick.get(time);
                 if (!timeMap.isEmpty()) {
                     Set<String> urls = timeMap.keySet();
                     for (String url : urls) {
-                        Map<String, Map<String, List<String>>> positionMap = timeMap.get(url);
-                        if (!positionMap.isEmpty()) {
-                            Set<String> positions = positionMap.keySet();
-                            for (String position : positions) {
-                                Map<String, List<String>> pidMap = positionMap.get(position);
-                                if (!pidMap.isEmpty()) {
-                                    Set<String> pids = pidMap.keySet();
-                                    for (String pid : pids) {
-                                        List<String> list = pidMap.get(pid);
-                                        if (CollectionUtils.isNotEmpty(list)) {
-                                            ProductClickBean productClickBean = new ProductClickBean(time, url, "icon",
-                                                    position, pid, list.size());
-                                            iconClicks.add(productClickBean);
+                        Map<String, Map<String, Map<String, List<String>>>> channelMap = timeMap.get(url);
+                        if (!channelMap.isEmpty()) {
+                            Set<String> channelKeys = channelMap.keySet();
+                            for (String channel : channelKeys) {
+                                Map<String, Map<String, List<String>>> positionMap = channelMap.get(channel);
+                                if (!positionMap.isEmpty()) {
+                                    Set<String> positions = positionMap.keySet();
+                                    for (String position : positions) {
+                                        Map<String, List<String>> pidMap = positionMap.get(position);
+                                        if (!pidMap.isEmpty()) {
+                                            Set<String> pids = pidMap.keySet();
+                                            for (String pid : pids) {
+                                                List<String> list = pidMap.get(pid);
+                                                if (CollectionUtils.isNotEmpty(list)) {
+                                                    ProductClickBean productClickBean = new ProductClickBean(time, url,
+                                                            "icon", position, pid, channel, list.size());
+                                                    bannerClicks.add(productClickBean);
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
                             }
+
                         }
+
                     }
                 }
             }
         }
-
         // button 点击
         if (!preButtonClick.isEmpty()) {
             Set<String> times = preButtonClick.keySet();
             for (String time : times) {
-                Map<String, Map<String, Map<String, List<String>>>> timeMap = preButtonClick.get(time);
+
+                Map<String, Map<String, Map<String, Map<String, List<String>>>>> timeMap = preButtonClick.get(time);
                 if (!timeMap.isEmpty()) {
                     Set<String> urls = timeMap.keySet();
                     for (String url : urls) {
-                        Map<String, Map<String, List<String>>> positionMap = timeMap.get(url);
-                        if (!positionMap.isEmpty()) {
-                            Set<String> positions = positionMap.keySet();
-                            for (String position : positions) {
-                                Map<String, List<String>> pidMap = positionMap.get(position);
-                                if (!pidMap.isEmpty()) {
-                                    Set<String> pids = pidMap.keySet();
-                                    for (String pid : pids) {
-                                        List<String> list = pidMap.get(pid);
-                                        if (CollectionUtils.isNotEmpty(list)) {
-                                            ProductClickBean productClickBean = new ProductClickBean(time, url,
-                                                    "button", position, pid, list.size());
-                                            buttonClicks.add(productClickBean);
+                        Map<String, Map<String, Map<String, List<String>>>> channelMap = timeMap.get(url);
+                        if (!channelMap.isEmpty()) {
+                            Set<String> channelKeys = channelMap.keySet();
+                            for (String channel : channelKeys) {
+                                Map<String, Map<String, List<String>>> positionMap = channelMap.get(channel);
+                                if (!positionMap.isEmpty()) {
+                                    Set<String> positions = positionMap.keySet();
+                                    for (String position : positions) {
+                                        Map<String, List<String>> pidMap = positionMap.get(position);
+                                        if (!pidMap.isEmpty()) {
+                                            Set<String> pids = pidMap.keySet();
+                                            for (String pid : pids) {
+                                                List<String> list = pidMap.get(pid);
+                                                if (CollectionUtils.isNotEmpty(list)) {
+                                                    ProductClickBean productClickBean = new ProductClickBean(time, url,
+                                                            "button", position, pid, channel, list.size());
+                                                    bannerClicks.add(productClickBean);
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
                             }
+
                         }
+
                     }
                 }
             }
         }
 
-        if(CollectionUtils.isNotEmpty(buttonClicks)){
+        if (CollectionUtils.isNotEmpty(buttonClicks)) {
             meiliyunDAO.insertPclick(buttonClicks);
         }
-        if(CollectionUtils.isNotEmpty(iconClicks)){
+        if (CollectionUtils.isNotEmpty(iconClicks)) {
             meiliyunDAO.insertPclick(iconClicks);
         }
-        if(CollectionUtils.isNotEmpty(bannerClicks)){
+        if (CollectionUtils.isNotEmpty(bannerClicks)) {
             meiliyunDAO.insertPclick(bannerClicks);
         }
+
+        scpTaskV2.initTime();
 
         LOGGER.info("end to analyser log : " + fileName);
     }
 
-    public String getCurrentDate() {
-        Calendar now = Calendar.getInstance();
-        int YEAR = now.get(Calendar.YEAR);
-        int MONTH = now.get(Calendar.MONTH);
-        int DAY = now.get(Calendar.DAY_OF_MONTH);
-        String dateStr = YEAR + "-" + (MONTH + 1) + "-" + (DAY - 1);
+    public String getOneDayBefore() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date time = cal.getTime();
+        String dateStr = new SimpleDateFormat("yyyy-MM-dd").format(time);
 
         return dateStr;
+
     }
 
     public String formateDate(String dataStr) {
@@ -478,8 +614,12 @@ public class ScpTask {
 
     public static void main(String[] args) throws ParseException, IOException, SQLException {
 
-        System.out.println("https://www.xianjinshijie.com:8443/show_list_page.do".split("8443/")[1]);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, 0);
+        Date time = cal.getTime();
+        String dateStr = new SimpleDateFormat("yyyy-MM-dd").format(time);
 
+        System.out.println(dateStr);
     }
 
 }

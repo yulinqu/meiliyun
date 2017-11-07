@@ -15,18 +15,21 @@ public class ProductClickBean {
 
     private String pid;
 
+    private String channel;
+
     private int clickCount;
 
     public ProductClickBean() {
     }
 
-    public ProductClickBean(String timeRange, String referUrl, String area, String position, String pid,
+    public ProductClickBean(String timeRange, String referUrl, String area, String position, String pid, String channel,
             int clickCount) {
         this.timeRange = timeRange;
         this.referUrl = referUrl;
         this.area = area;
         this.position = position;
         this.pid = pid;
+        this.channel = channel;
         this.clickCount = clickCount;
     }
 
@@ -76,6 +79,14 @@ public class ProductClickBean {
 
     public void setPid(String pid) {
         this.pid = pid;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     @Override

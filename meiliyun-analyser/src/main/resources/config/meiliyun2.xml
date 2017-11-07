@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+        PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+        "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="meiliyun">
+
+	<!-- 插入pvuv -->
+     <insert id="insert_pvuv" parameterClass="java.util.List">
+   		insert into pvuv(time_range,url,uuid,channel,ip) values
+	     <iterate  conjunction =",">   
+		      <![CDATA[  
+	             (#pvuv[].timeRange#, #pvuv[].url#, #pvuv[].uuid#, #pvuv[].channel#, #pvuv[].ip#)
+	         ]]>   
+	      </iterate>  
+	</insert>
+	
+	<insert id="insert_pclick" parameterClass="java.util.List">
+   		insert into pclick(time_range,url,area,position,pid,channel,ip) values
+	     <iterate  conjunction =",">   
+		      <![CDATA[  
+	             (#pclick[].timeRange#, #pclick[].url#,#pclick[].area#,#pclick[].position#,#pclick[].pid#,#pclick[].channel#,,#pclick[].ip#)
+	         ]]>   
+	      </iterate>  
+	</insert>
+	
+	
+	 <select id="get_hour_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
+	 		#url# url,
+	 		count(*) pv,
+	 		count(distinct uuid) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') order by timeRange desc
+	 ]]>
+    </select>
+    
+    <select id="get_day_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
+	 		#url# url,
+	 		count(*) pv,
+	 		count(distinct uuid) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m-%d') order by timeRange desc
+	 ]]>
+    </select>
+    
+    <select id="get_month_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m') timeRange,
+	 		#url# url,
+	 		count(*) pv,
+	 		count(distinct uuid) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%m') order by timeRange desc
+	 ]]>
+    </select>
+    
+    <select id="get_week_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
+	 		#url# url,
+	 		count(*) pv,
+	 		count(distinct uuid) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time#
+	 	and url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') order by timeRange desc
+	 ]]>
+    </select>
+    
+    <select id="get_minute_pvuv" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		time_range timeRange,
+	 		#url# url,
+	 		count(*) pv,
+	 		count(distinct uuid) uv
+	 	from pvuv where time_range>=#start_time# and time_range<#end_time# and url=#url# 
+	 	group by time_range
+	 	order by timeRange desc
+	 ]]>
+    </select>
+    
+     <select id="get_hour_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[
+	  select a.* from(
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S'),t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.company=#ad#  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S'),t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc
+	 ]]>
+    </select>
+
+
+	<select id="get_hour_click_each" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<![CDATA[
+		select a.* from (
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
+	 		t2.subName as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA in ('icon','button') group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S'),t2.subName,t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
+	 		t2.company as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA='banner' group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S'),t2.company,t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc,a.POSITION asc,a.AREA asc
+	 ]]>
+	</select>
+
+    
+    <select id="get_hour_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d %H'),'%Y-%m-%d %H:%i:%S'),t1.AREA,t1.POSITION
+	 	order by timeRange desc,t1.POSITION asc,t1.AREA asc
+	 ]]>
+    </select>
+    
+    <select id="get_day_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[
+	  select a.* from (
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d'),t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.company=#ad#  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d'),t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc
+	 ]]>
+    </select>
+
+
+	<select id="get_day_click_each" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<![CDATA[
+		select a.* from (
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
+	 		t2.subName as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA in ('icon','button')  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d'),t2.subName,t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
+	 		t2.company as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA='banner' group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d'),t2.company,t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc,a.POSITION asc,a.AREA asc
+	 ]]>
+	</select>
+
+    
+    <select id="get_day_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m-%d'),t1.AREA,t1.POSITION
+	 	order by timeRange desc,t1.POSITION asc,t1.AREA asc
+	 ]]>
+    </select>
+    
+    
+    <select id="get_month_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[
+	  select a.* from (
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m'),t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.company=#ad#  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m'),t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc
+	 ]]>
+    </select>
+
+
+	<select id="get_month_click_each" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<![CDATA[
+		select a.* from (
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m') timeRange,
+	 		t2.subName as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA in ('icon','button')  group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m'),t2.subName,t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m') timeRange,
+	 		t2.company as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA='banner' group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m'),t2.company,t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc,a.POSITION asc,a.AREA asc
+	 ]]>
+	</select>
+
+    
+    <select id="get_month_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m') as timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by DATE_FORMAT(str_to_date(t1.time_range, '%Y-%m-%d'),'%Y-%m'),t1.AREA,t1.POSITION
+	 	order by timeRange desc,t1.POSITION asc,t1.AREA asc
+	 ]]>
+    </select>
+    
+    
+    <select id="get_week_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[
+	  select a.* from (
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad#  group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u'),t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.company=#ad#  group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u'),t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc
+	 ]]>
+    </select>
+
+
+	<select id="get_week_click_each" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<![CDATA[
+		select a.* from (
+	 	select
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
+	 		t2.subName as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA in ('icon','button') group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u'),t2.subName,t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
+	 		t2.company as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA='banner' group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u'),t2.company,t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc,a.POSITION asc,a.AREA asc
+	 ]]>
+	</select>
+
+    <select id="get_week_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u') timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by DATE_FORMAT(str_to_date(time_range, '%Y-%m-%d'),'%Y-%u'),t1.AREA,t1.POSITION
+	 	order by timeRange desc,t1.POSITION asc,t1.AREA asc
+	 ]]>
+    </select>
+    
+     <select id="get_minute_click" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[
+	  select a.* from (
+	 	select 
+	 		t1.time_range timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.subName=#ad# group by t1.time_range,t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		t1.time_range timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t2.company=#ad#  group by t1.time_range,t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc
+	 ]]>
+    </select>
+
+
+	<select id="get_minute_click_each" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<![CDATA[
+		select a.* from(
+	 	select
+	 		t1.time_range timeRange,
+	 		t2.subName as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1 inner join subinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA in ('icon','button') group by t1.time_range,t2.subName,t1.AREA,t1.POSITION
+	 	union all
+	 	select
+	 		t1.time_range timeRange,
+	 		t2.company as advertisment,
+	 		#url# as url,
+	 		AREA,
+	 		POSITION,
+	 		sum(COUNT) as totalCount
+	 	from pclick t1 inner join companyinfo t2 on t1.PID=t2.ID
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# and t1.AREA='banner' group by t1.time_range,t2.company,t1.AREA,t1.POSITION) a
+	 	order by a.timeRange desc,a.POSITION asc,a.AREA asc
+	 ]]>
+	</select>
+    
+    
+     <select id="get_minute_click_all" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	 	select 
+	 		t1.time_range timeRange,
+	 		#ad# as advertisment,
+	 		#url# as url,
+	 		t1.AREA,
+	 		t1.POSITION,
+	 		sum(t1.COUNT) as totalCount
+	 	from pclick t1
+	 	where t1.time_range>=#start_time# and t1.time_range<#end_time#
+	 	and t1.url=#url# group by t1.time_range,t1.AREA,t1.POSITION
+	 	order by timeRange desc,t1.POSITION asc,t1.AREA asc
+	 ]]>
+    </select>
+    
+    
+</sqlMap>
