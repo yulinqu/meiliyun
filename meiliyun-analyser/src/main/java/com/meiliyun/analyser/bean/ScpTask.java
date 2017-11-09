@@ -169,9 +169,15 @@ public class ScpTask {
                         }
 
                         // 访问list_page
-                        if (data.contains("/img/behavior.gif?rnd=")) {
-                            // pvuv
-                            pvuvs.add(new PvUv(reTime, url, uuid, channel));
+                        if (data.contains("/img/behavior.gif?rnd=")
+                                || data.contains("/img/behavior.gif?version=new-grid&rnd")) {
+                            if (data.contains("/img/behavior.gif?version=new-grid&rnd")) {
+                                // pvuv
+                                pvuvs.add(new PvUv(reTime, url + "_new", uuid, channel));
+                            } else {
+                                // pvuv
+                                pvuvs.add(new PvUv(reTime, url, uuid, channel));
+                            }
                         }
                         // banner点击
                         else {

@@ -1,18 +1,29 @@
 package com.meiliyun.analyser.bean;
 
-import com.meiliyun.analyser.dao.MeiliyunDAO;
-import com.meiliyun.analyser.utils.ScpUtils;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.meiliyun.analyser.dao.MeiliyunDAO;
+import com.meiliyun.analyser.utils.ScpUtils;
 
 /**
  * 每天定时去nginx服务器scp文件到本地
@@ -32,12 +43,11 @@ public class ScpTaskV2 {
 
     private static Logger LOGGER = Logger.getLogger(ScpTaskV2.class);
 
-
-    public void initTime(){
-        init_time="2017-01-01 00:00:00";
+    public void initTime() {
+        init_time = "2017-01-01 00:00:00";
     }
 
-    public String getInitTime(){
+    public String getInitTime() {
         return init_time;
     }
 
@@ -58,7 +68,8 @@ public class ScpTaskV2 {
         LOGGER.info("from remote server scp file : " + fileName + " success !");
         // 复制到本地的日志文件
         File localFile = new File(localPath + fileName);
-        //File localFile = new File("/Users/yulinqu/workspace/meiliyun/meiliyun-analyser/src/main/resources/db/access.txt");
+        // File localFile = new
+        // File("/Users/yulinqu/workspace/meiliyun/meiliyun-analyser/src/main/resources/db/access.txt");
         LOGGER.info("start to analyser log : " + fileName);
 
         if (!localFile.exists()) {
@@ -137,10 +148,17 @@ public class ScpTaskV2 {
                             }
 
                             // 访问list_page
-                            if (data.contains("/img/behavior.gif?rnd=")) {
-                                // pvuv
-                                pvuvs.add(new PvUv(reTime, url, uuid, channel));
+                            if (data.contains("/img/behavior.gif?rnd=")
+                                    || data.contains("/img/behavior.gif?version=new-grid&rnd")) {
+                                if (data.contains("/img/behavior.gif?version=new-grid&rnd")) {
+                                    // pvuv
+                                    pvuvs.add(new PvUv(reTime, url + "_new", uuid, channel));
+                                } else {
+                                    // pvuv
+                                    pvuvs.add(new PvUv(reTime, url, uuid, channel));
+                                }
                             }
+
                             // banner点击
                             else {
                                 if (data.contains("/img/behavior.gif?node=")) {
@@ -176,15 +194,15 @@ public class ScpTaskV2 {
                                                     if (preBannerClick.get(reTime).get(url).get(channel)
                                                             .get(position) != null) {
 
-                                                        if (preBannerClick.get(reTime).get(url).get(channel).get(position)
-                                                                .get(pid) != null) {
-                                                            preBannerClick.get(reTime).get(url).get(channel).get(position)
-                                                                    .get(pid).add(pid);
+                                                        if (preBannerClick.get(reTime).get(url).get(channel)
+                                                                .get(position).get(pid) != null) {
+                                                            preBannerClick.get(reTime).get(url).get(channel)
+                                                                    .get(position).get(pid).add(pid);
                                                         } else {
-                                                            preBannerClick.get(reTime).get(url).get(channel).get(position)
-                                                                    .put(pid, new ArrayList<String>());
-                                                            preBannerClick.get(reTime).get(url).get(channel).get(position)
-                                                                    .get(pid).add(pid);
+                                                            preBannerClick.get(reTime).get(url).get(channel)
+                                                                    .get(position).put(pid, new ArrayList<String>());
+                                                            preBannerClick.get(reTime).get(url).get(channel)
+                                                                    .get(position).get(pid).add(pid);
                                                         }
 
                                                     } else {
@@ -192,11 +210,11 @@ public class ScpTaskV2 {
                                                         preBannerClick.get(reTime).get(url).get(channel).put(position,
                                                                 new HashMap<String, List<String>>());
 
-                                                        preBannerClick.get(reTime).get(url).get(channel).get(position).put(pid,
-                                                                new ArrayList<String>());
+                                                        preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                                .put(pid, new ArrayList<String>());
 
-                                                        preBannerClick.get(reTime).get(url).get(channel).get(position).get(pid)
-                                                                .add(pid);
+                                                        preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
                                                     }
 
                                                 } else {
@@ -207,11 +225,11 @@ public class ScpTaskV2 {
                                                     preBannerClick.get(reTime).get(url).get(channel).put(position,
                                                             new HashMap<String, List<String>>());
 
-                                                    preBannerClick.get(reTime).get(url).get(channel).get(position).put(pid,
-                                                            new ArrayList<String>());
+                                                    preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                            .put(pid, new ArrayList<String>());
 
-                                                    preBannerClick.get(reTime).get(url).get(channel).get(position).get(pid)
-                                                            .add(pid);
+                                                    preBannerClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid).add(pid);
 
                                                 }
 
@@ -253,7 +271,8 @@ public class ScpTaskV2 {
 
                                                 if (preIconClick.get(reTime).get(url).get(channel) != null) {
 
-                                                    if (preIconClick.get(reTime).get(url).get(channel).get(position) != null) {
+                                                    if (preIconClick.get(reTime).get(url).get(channel)
+                                                            .get(position) != null) {
 
                                                         if (preIconClick.get(reTime).get(url).get(channel).get(position)
                                                                 .get(pid) != null) {
@@ -271,11 +290,11 @@ public class ScpTaskV2 {
                                                         preIconClick.get(reTime).get(url).get(channel).put(position,
                                                                 new HashMap<String, List<String>>());
 
-                                                        preIconClick.get(reTime).get(url).get(channel).get(position).put(pid,
-                                                                new ArrayList<String>());
+                                                        preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                                .put(pid, new ArrayList<String>());
 
-                                                        preIconClick.get(reTime).get(url).get(channel).get(position).get(pid)
-                                                                .add(pid);
+                                                        preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
                                                     }
 
                                                 } else {
@@ -286,11 +305,11 @@ public class ScpTaskV2 {
                                                     preIconClick.get(reTime).get(url).get(channel).put(position,
                                                             new HashMap<String, List<String>>());
 
-                                                    preIconClick.get(reTime).get(url).get(channel).get(position).put(pid,
-                                                            new ArrayList<String>());
+                                                    preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                            .put(pid, new ArrayList<String>());
 
-                                                    preIconClick.get(reTime).get(url).get(channel).get(position).get(pid)
-                                                            .add(pid);
+                                                    preIconClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid).add(pid);
 
                                                 }
 
@@ -307,7 +326,8 @@ public class ScpTaskV2 {
                                                 preIconClick.get(reTime).get(url).get(channel).get(position).put(pid,
                                                         new ArrayList<String>());
 
-                                                preIconClick.get(reTime).get(url).get(channel).get(position).get(pid).add(pid);
+                                                preIconClick.get(reTime).get(url).get(channel).get(position).get(pid)
+                                                        .add(pid);
                                             }
 
                                         }
@@ -333,15 +353,15 @@ public class ScpTaskV2 {
                                                     if (preButtonClick.get(reTime).get(url).get(channel)
                                                             .get(position) != null) {
 
-                                                        if (preButtonClick.get(reTime).get(url).get(channel).get(position)
-                                                                .get(pid) != null) {
-                                                            preButtonClick.get(reTime).get(url).get(channel).get(position)
-                                                                    .get(pid).add(pid);
+                                                        if (preButtonClick.get(reTime).get(url).get(channel)
+                                                                .get(position).get(pid) != null) {
+                                                            preButtonClick.get(reTime).get(url).get(channel)
+                                                                    .get(position).get(pid).add(pid);
                                                         } else {
-                                                            preButtonClick.get(reTime).get(url).get(channel).get(position)
-                                                                    .put(pid, new ArrayList<String>());
-                                                            preButtonClick.get(reTime).get(url).get(channel).get(position)
-                                                                    .get(pid).add(pid);
+                                                            preButtonClick.get(reTime).get(url).get(channel)
+                                                                    .get(position).put(pid, new ArrayList<String>());
+                                                            preButtonClick.get(reTime).get(url).get(channel)
+                                                                    .get(position).get(pid).add(pid);
                                                         }
 
                                                     } else {
@@ -349,11 +369,11 @@ public class ScpTaskV2 {
                                                         preButtonClick.get(reTime).get(url).get(channel).put(position,
                                                                 new HashMap<String, List<String>>());
 
-                                                        preButtonClick.get(reTime).get(url).get(channel).get(position).put(pid,
-                                                                new ArrayList<String>());
+                                                        preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                                .put(pid, new ArrayList<String>());
 
-                                                        preButtonClick.get(reTime).get(url).get(channel).get(position).get(pid)
-                                                                .add(pid);
+                                                        preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                                .get(pid).add(pid);
                                                     }
 
                                                 } else {
@@ -364,11 +384,11 @@ public class ScpTaskV2 {
                                                     preButtonClick.get(reTime).get(url).get(channel).put(position,
                                                             new HashMap<String, List<String>>());
 
-                                                    preButtonClick.get(reTime).get(url).get(channel).get(position).put(pid,
-                                                            new ArrayList<String>());
+                                                    preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                            .put(pid, new ArrayList<String>());
 
-                                                    preButtonClick.get(reTime).get(url).get(channel).get(position).get(pid)
-                                                            .add(pid);
+                                                    preButtonClick.get(reTime).get(url).get(channel).get(position)
+                                                            .get(pid).add(pid);
 
                                                 }
 
@@ -581,41 +601,7 @@ public class ScpTaskV2 {
 
     public static void main(String[] args) throws ParseException, IOException, SQLException {
 
-        System.out.println("https://www.xianjinshijie.com:8443/show_list_page.do".split("8443/")[1]);
-
-        String test = "https://www.xianjinshijie.com:8344/show_list_page.do_new?channel=dx";
-
-        // Referer 当前页url https://www.xianjinshijie.com:8344/show_list_page.do?channel=dx
-        String referer = test.replaceAll(" ", "").replace("://", "").replace(":8443", "");
-        // 请求url
-        String url = "show_list_page.do";
-        String[] refererSplit = referer.split("/");
-        String onlineUrl = refererSplit[1];
-        String channel = null;
-        if (onlineUrl.contains("?")) {
-            String[] onlineUrlsplit = onlineUrl.split("\\?");
-            // 渠道
-            if (StringUtils.isNotBlank(onlineUrlsplit[0])) {
-                url = onlineUrlsplit[0];
-                if (StringUtils.isNotBlank(onlineUrlsplit[1])) {
-                    String[] parameters = onlineUrlsplit[1].split("&");
-                    for (String parameter : parameters) {
-                        String[] parameterSplite = parameter.split("=");
-                        if ("channel".equals(parameterSplite[0])) {
-                            channel = parameterSplite[1];
-                        }
-                    }
-                }
-
-            }
-        }
-
-        System.out.println(url);
-        System.out.println(channel);
-
-
-        System.out.println("2017-11-04 23:23:00".compareToIgnoreCase("2017-11-04 23:22:01"));
-
+        System.out.println(1220 / 2000);
 
     }
 
