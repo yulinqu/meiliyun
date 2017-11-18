@@ -96,7 +96,7 @@ public class ScpTask {
             return;
         }
 
-        String initTime = meiliyunDAO.getMaxTimeRange();
+        String initTime = scpTaskV2.getInitTime();
         meiliyunDAO.deletePvuv(initTime);
         meiliyunDAO.deletePclick(initTime);
 
@@ -128,9 +128,7 @@ public class ScpTask {
                         reTime = formateDate(requestTime);
                     }
 
-                    if (reTime.compareToIgnoreCase(initTime) == -1) {
-                        continue;
-                    }
+                    if (reTime.compareToIgnoreCase(initTime) >= 0) {
 
                     // 埋点数据
                     String data = split[2];
@@ -431,7 +429,7 @@ public class ScpTask {
 
                                     }
                                 }
-                            }
+                            }}
                         }
 
                     }
